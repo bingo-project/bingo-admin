@@ -17,10 +17,7 @@ export namespace SystemRoleApi {
  * 获取角色列表数据
  */
 async function getRoleList(params: Recordable<any>) {
-  return requestClient.get<Array<SystemRoleApi.SystemRole>>(
-    '/system/role/list',
-    { params },
-  );
+  return requestClient.get('/v1/roles', { params });
 }
 
 /**
@@ -28,28 +25,28 @@ async function getRoleList(params: Recordable<any>) {
  * @param data 角色数据
  */
 async function createRole(data: Omit<SystemRoleApi.SystemRole, 'id'>) {
-  return requestClient.post('/system/role', data);
+  return requestClient.post('/v1/roles', data);
 }
 
 /**
  * 更新角色
  *
- * @param id 角色 ID
+ * @param name 角色名称
  * @param data 角色数据
  */
 async function updateRole(
-  id: string,
+  name: string,
   data: Omit<SystemRoleApi.SystemRole, 'id'>,
 ) {
-  return requestClient.put(`/system/role/${id}`, data);
+  return requestClient.put(`/v1/roles/${name}`, data);
 }
 
 /**
  * 删除角色
- * @param id 角色 ID
+ * @param name 角色名称
  */
-async function deleteRole(id: string) {
-  return requestClient.delete(`/system/role/${id}`);
+async function deleteRole(name: string) {
+  return requestClient.delete(`/v1/roles/${name}`);
 }
 
 export { createRole, deleteRole, getRoleList, updateRole };

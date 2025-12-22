@@ -90,31 +90,71 @@ export namespace SystemMenuApi {
   }
 }
 
+/** 后端返回的菜单结构 */
+interface BackendMenu {
+  children?: BackendMenu[];
+  component: string;
+  hidden: boolean;
+  icon: string;
+  id: number;
+  name: string;
+  parentID: number;
+  path: string;
+  redirect?: string;
+  sort: number;
+  title: string;
+}
+
 /**
- * 获取菜单数据列表
+ * 将后端菜单格式转换为前端期望的格式
+ */
+function transformMenuData(menu: BackendMenu): SystemMenuApi.SystemMenu {
+  const result: SystemMenuApi.SystemMenu = {
+    authCode: '',
+    component: menu.component,
+    id: String(menu.id),
+    meta: {
+      hideInMenu: menu.hidden,
+      icon: menu.icon,
+      order: menu.sort,
+      title: menu.title,
+    },
+    name: menu.name,
+    path: menu.path,
+    pid: String(menu.parentID),
+    redirect: menu.redirect,
+    type: 'menu',
+  };
+
+  if (menu.children && menu.children.length > 0) {
+    result.children = menu.children.map(transformMenuData);
+  }
+
+  return result;
+}
+
+/**
+ * 获取菜单树形数据
  */
 async function getMenuList() {
-  return requestClient.get<Array<SystemMenuApi.SystemMenu>>(
-    '/system/menu/list',
-  );
+  const data = await requestClient.get<BackendMenu[]>('/v1/menus/tree');
+  return data.map(transformMenuData);
 }
 
 async function isMenuNameExists(
   name: string,
   id?: SystemMenuApi.SystemMenu['id'],
 ) {
-  return requestClient.get<boolean>('/system/menu/name-exists', {
-    params: { id, name },
-  });
+  // TODO: 后端暂无此接口，先返回 false
+  return Promise.resolve(false);
 }
 
 async function isMenuPathExists(
   path: string,
   id?: SystemMenuApi.SystemMenu['id'],
 ) {
-  return requestClient.get<boolean>('/system/menu/path-exists', {
-    params: { id, path },
-  });
+  // TODO: 后端暂无此接口，先返回 false
+  return Promise.resolve(false);
 }
 
 /**
@@ -124,7 +164,7 @@ async function isMenuPathExists(
 async function createMenu(
   data: Omit<SystemMenuApi.SystemMenu, 'children' | 'id'>,
 ) {
-  return requestClient.post('/system/menu', data);
+  return requestClient.post('/v1/menus', data);
 }
 
 /**
@@ -137,7 +177,7 @@ async function updateMenu(
   id: string,
   data: Omit<SystemMenuApi.SystemMenu, 'children' | 'id'>,
 ) {
-  return requestClient.put(`/system/menu/${id}`, data);
+  return requestClient.put(`/v1/menus/${id}`, data);
 }
 
 /**
@@ -145,7 +185,7 @@ async function updateMenu(
  * @param id 菜单 ID
  */
 async function deleteMenu(id: string) {
-  return requestClient.delete(`/system/menu/${id}`);
+  return requestClient.delete(`/v1/menus/${id}`);
 }
 
 export {

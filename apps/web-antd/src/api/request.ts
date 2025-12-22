@@ -7,6 +7,7 @@ import { useAppConfig } from '@vben/hooks';
 import { preferences } from '@vben/preferences';
 import {
   authenticateResponseInterceptor,
+  defaultResponseInterceptor,
   errorMessageResponseInterceptor,
   RequestClient,
 } from '@vben/request';
@@ -70,17 +71,14 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
     },
   });
 
-  // 后端直接返回数据，不使用 code/data 包装格式
-  // 直接提取 response.data 返回
-  client.addResponseInterceptor({
-    fulfilled: (response) => {
-      const { data, status } = response;
-      if (status >= 200 && status < 400) {
-        return data;
-      }
-      throw Object.assign({}, response, { response });
-    },
-  });
+  // 处理响应数据：后端直接返回数据，不使用 code/data 包装
+  client.addResponseInterceptor(
+    defaultResponseInterceptor({
+      codeField: 'code',
+      dataField: 'data',
+      successCode: 0,
+    }),
+  );
 
   // token过期的处理
   client.addResponseInterceptor(
