@@ -7,9 +7,10 @@ export namespace SystemRoleApi {
     [key: string]: any;
     id: string;
     name: string;
+    description?: string;
     permissions: string[];
     remark?: string;
-    status: 0 | 1;
+    status: 'enabled' | 'disabled';
   }
 }
 

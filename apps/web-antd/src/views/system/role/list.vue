@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import type { Recordable } from '@vben/types';
+
 import type {
   OnActionClickParams,
   VxeTableGridOptions,
@@ -8,10 +10,10 @@ import type { SystemRoleApi } from '#/api';
 import { Page, useVbenDrawer } from '@vben/common-ui';
 import { Plus } from '@vben/icons';
 
-import { Button, message } from 'ant-design-vue';
+import { Button, message, Modal } from 'ant-design-vue';
 
 import { toApiPagination, useVbenVxeGrid } from '#/adapter/vxe-table';
-import { deleteRole, getRoleList } from '#/api';
+import { deleteRole, getRoleList, updateRole } from '#/api';
 import { $t } from '#/locales';
 
 import { useColumns, useGridFormSchema } from './data';
@@ -24,11 +26,18 @@ const [FormDrawer, formDrawerApi] = useVbenDrawer({
 
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
+    fieldMappingTime: [
+      [
+        'createdAt',
+        ['createdAtFrom', 'createdAtTo'],
+        ['YYYY-MM-DD[T]00:00:00Z', 'YYYY-MM-DD[T]23:59:59Z'],
+      ],
+    ],
     schema: useGridFormSchema(),
     submitOnChange: true,
   },
   gridOptions: {
-    columns: useColumns(onActionClick),
+    columns: useColumns(onActionClick, onStatusChange),
     height: 'auto',
     keepSource: true,
     proxyConfig: {
@@ -65,6 +74,41 @@ function onActionClick(e: OnActionClickParams<SystemRoleApi.SystemRole>) {
       onEdit(e.row);
       break;
     }
+  }
+}
+
+function confirm(content: string, title: string) {
+  return new Promise((resolve, reject) => {
+    Modal.confirm({
+      content,
+      onCancel() {
+        reject(new Error('已取消'));
+      },
+      onOk() {
+        resolve(true);
+      },
+      title,
+    });
+  });
+}
+
+async function onStatusChange(
+  newStatus: string,
+  row: SystemRoleApi.SystemRole,
+) {
+  const status: Recordable<string> = {
+    disabled: $t('common.disabled'),
+    enabled: $t('common.enabled'),
+  };
+  try {
+    await confirm(
+      `${$t('ui.actionMessage.confirmStatusChange', [row.name, status[newStatus]])}`,
+      $t('ui.actionTitle.statusChange'),
+    );
+    await updateRole(row.name, { status: newStatus });
+    return true;
+  } catch {
+    return false;
   }
 }
 

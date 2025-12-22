@@ -13,14 +13,16 @@
     "edit": "Modify {0}",
     "create": "Create {0}",
     "delete": "Delete {0}",
-    "view": "View {0}"
+    "view": "View {0}",
+    "statusChange": "Change Status"
   },
   "actionMessage": {
     "deleteConfirm": "Are you sure to delete {0}?",
     "deleting": "Deleting {0} ...",
     "deleteSuccess": "{0} deleted successfully",
     "operationSuccess": "Operation succeeded",
-    "operationFailed": "Operation failed"
+    "operationFailed": "Operation failed",
+    "confirmStatusChange": "Are you sure to change {0}'s status to [{1}]?"
   },
   "placeholder": {
     "input": "Please enter",

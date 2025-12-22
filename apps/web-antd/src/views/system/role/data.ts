@@ -23,12 +23,12 @@ export function useFormSchema(): VbenFormSchema[] {
       componentProps: {
         buttonStyle: 'solid',
         options: [
-          { label: $t('common.enabled'), value: 1 },
-          { label: $t('common.disabled'), value: 0 },
+          { label: $t('common.enabled'), value: 'enabled' },
+          { label: $t('common.disabled'), value: 'disabled' },
         ],
         optionType: 'button',
       },
-      defaultValue: 1,
+      defaultValue: 'enabled',
       fieldName: 'status',
       label: $t('system.role.status'),
     },
@@ -59,6 +59,23 @@ export function useGridFormSchema(): VbenFormSchema[] {
       fieldName: 'description',
       label: $t('system.role.description'),
     },
+    {
+      component: 'Select',
+      componentProps: {
+        allowClear: true,
+        options: [
+          { label: $t('common.enabled'), value: 'enabled' },
+          { label: $t('common.disabled'), value: 'disabled' },
+        ],
+      },
+      fieldName: 'status',
+      label: $t('system.role.status'),
+    },
+    {
+      component: 'RangePicker',
+      fieldName: 'createdAt',
+      label: $t('system.role.createdAt'),
+    },
   ];
 }
 
@@ -81,6 +98,16 @@ export function useColumns<T = SystemRoleApi.SystemRole>(
       cellRender: {
         attrs: { beforeChange: onStatusChange },
         name: onStatusChange ? 'CellSwitch' : 'CellTag',
+        options: [
+          { color: 'success', label: $t('common.enabled'), value: 'enabled' },
+          { color: 'error', label: $t('common.disabled'), value: 'disabled' },
+        ],
+        props: {
+          checkedChildren: $t('common.enabled'),
+          checkedValue: 'enabled',
+          unCheckedChildren: $t('common.disabled'),
+          unCheckedValue: 'disabled',
+        },
       },
       field: 'status',
       title: $t('system.role.status'),
