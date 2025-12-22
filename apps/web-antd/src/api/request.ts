@@ -7,7 +7,6 @@ import { useAppConfig } from '@vben/hooks';
 import { preferences } from '@vben/preferences';
 import {
   authenticateResponseInterceptor,
-  defaultResponseInterceptor,
   errorMessageResponseInterceptor,
   RequestClient,
 } from '@vben/request';
@@ -71,14 +70,17 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
     },
   });
 
-  // 处理返回的响应数据格式
-  client.addResponseInterceptor(
-    defaultResponseInterceptor({
-      codeField: 'code',
-      dataField: 'data',
-      successCode: 0,
-    }),
-  );
+  // 后端直接返回数据，不使用 code/data 包装格式
+  // 直接提取 response.data 返回
+  client.addResponseInterceptor({
+    fulfilled: (response) => {
+      const { data, status } = response;
+      if (status >= 200 && status < 400) {
+        return data;
+      }
+      throw Object.assign({}, response, { response });
+    },
+  });
 
   // token过期的处理
   client.addResponseInterceptor(
@@ -94,11 +96,9 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
   // 通用的错误处理,如果没有进入上面的错误处理逻辑，就会进入这里
   client.addResponseInterceptor(
     errorMessageResponseInterceptor((msg: string, error) => {
-      // 这里可以根据业务进行定制,你可以拿到 error 内的信息进行定制化处理，根据不同的 code 做不同的提示，而不是直接使用 message.error 提示 msg
-      // 当前mock接口返回的错误字段是 error 或者 message
+      // 后端错误响应格式: { message, reason, metadata }
       const responseData = error?.response?.data ?? {};
-      const errorMessage = responseData?.error ?? responseData?.message ?? '';
-      // 如果没有错误信息，则会根据状态码进行提示
+      const errorMessage = responseData?.message ?? responseData?.reason ?? '';
       message.error(errorMessage || msg);
     }),
   );
@@ -107,7 +107,8 @@ function createRequestClient(baseURL: string, options?: RequestClientOptions) {
 }
 
 export const requestClient = createRequestClient(apiURL, {
-  responseReturn: 'data',
+  // 后端直接返回数据，不使用 { code, data } 包装，所以用 'body' 直接获取响应体
+  responseReturn: 'body',
 });
 
 export const baseRequestClient = new RequestClient({ baseURL: apiURL });
