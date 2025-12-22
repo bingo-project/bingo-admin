@@ -14,7 +14,12 @@ import { Spin } from 'ant-design-vue';
 
 import { useVbenForm } from '#/adapter/form';
 import { getMenuList } from '#/api/system/menu';
-import { createRole, updateRole } from '#/api/system/role';
+import {
+  createRole,
+  getRoleMenus,
+  setRoleMenus,
+  updateRole,
+} from '#/api/system/role';
 import { $t } from '#/locales';
 
 import { useFormSchema } from '../data';
@@ -31,42 +36,68 @@ const [Form, formApi] = useVbenForm({
 const permissions = ref<DataNode[]>([]);
 const loadingPermissions = ref(false);
 
-const id = ref();
+const roleName = ref<string>();
 const [Drawer, drawerApi] = useVbenDrawer({
   async onConfirm() {
     const { valid } = await formApi.validate();
     if (!valid) return;
     const values = await formApi.getValues();
+    const menuIds = (values.permissions || []).map(Number);
     drawerApi.lock();
-    (id.value ? updateRole(id.value, values) : createRole(values))
-      .then(() => {
-        emits('success');
-        drawerApi.close();
-      })
-      .catch(() => {
-        drawerApi.unlock();
-      });
+
+    try {
+      if (roleName.value) {
+        await updateRole(roleName.value, values);
+        await setRoleMenus(roleName.value, menuIds);
+      } else {
+        await createRole(values);
+        if (values.name) {
+          await setRoleMenus(values.name, menuIds);
+        }
+      }
+      emits('success');
+      drawerApi.close();
+    } catch {
+      drawerApi.unlock();
+    }
   },
-  onOpenChange(isOpen) {
+  async onOpenChange(isOpen) {
     if (isOpen) {
       const data = drawerApi.getData<SystemRoleApi.SystemRole>();
       formApi.resetForm();
-      if (data) {
+
+      if (data?.name) {
         formData.value = data;
-        id.value = data.id;
+        roleName.value = data.name;
         formApi.setValues(data);
       } else {
-        id.value = undefined;
+        roleName.value = undefined;
+        formData.value = undefined;
       }
 
-      if (permissions.value.length === 0) {
-        loadPermissions();
+      // 先加载菜单树，再加载角色权限
+      await loadPermissions();
+      if (data?.name) {
+        await loadRoleMenus(data.name);
       }
     }
   },
 });
 
+async function loadRoleMenus(name: string) {
+  loadingPermissions.value = true;
+  try {
+    const menuIds = await getRoleMenus(name);
+    formApi.setFieldValue('permissions', menuIds.map(String));
+  } finally {
+    loadingPermissions.value = false;
+  }
+}
+
 async function loadPermissions() {
+  if (permissions.value.length > 0) {
+    return;
+  }
   loadingPermissions.value = true;
   try {
     const res = await getMenuList();
@@ -77,7 +108,7 @@ async function loadPermissions() {
 }
 
 const getDrawerTitle = computed(() => {
-  return formData.value?.id
+  return roleName.value
     ? $t('common.edit', $t('system.role.name'))
     : $t('common.create', $t('system.role.name'));
 });

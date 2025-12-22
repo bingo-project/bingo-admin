@@ -55,9 +55,10 @@
     "name": "Role",
     "roleName": "Role Name",
     "id": "Role ID",
+    "description": "Description",
     "status": "Status",
     "remark": "Remark",
-    "createTime": "Creation Time",
+    "createdAt": "Created At",
     "operation": "Operation",
     "permissions": "Permissions",
     "setPermissions": "Permissions"

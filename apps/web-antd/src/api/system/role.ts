@@ -49,4 +49,28 @@ async function deleteRole(name: string) {
   return requestClient.delete(`/v1/roles/${name}`);
 }
 
-export { createRole, deleteRole, getRoleList, updateRole };
+/**
+ * 获取角色的菜单权限ID列表
+ * @param name 角色名称
+ */
+async function getRoleMenus(name: string) {
+  return requestClient.get<number[]>(`/v1/roles/${name}/menus`);
+}
+
+/**
+ * 设置角色的菜单权限
+ * @param name 角色名称
+ * @param menuIds 菜单ID列表
+ */
+async function setRoleMenus(name: string, menuIds: number[]) {
+  return requestClient.put(`/v1/roles/${name}/menus`, { menuIDs: menuIds });
+}
+
+export {
+  createRole,
+  deleteRole,
+  getRoleList,
+  getRoleMenus,
+  setRoleMenus,
+  updateRole,
+};
