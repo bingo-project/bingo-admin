@@ -1,5 +1,9 @@
 <script lang="ts" setup>
+// ABOUTME: 基础布局组件，集成用户下拉菜单、通知、锁屏等功能
+// ABOUTME: 包含角色切换功能的集成
+
 import type { NotificationItem } from '@vben/layouts';
+import type { RoleInfo } from '@vben/types';
 
 import { computed, ref, watch } from 'vue';
 
@@ -94,8 +98,25 @@ const avatar = computed(() => {
   return userStore.userInfo?.avatar ?? preferences.app.defaultAvatar;
 });
 
+const currentRole = computed(() => {
+  return userStore.userInfo?.currentRole || '';
+});
+
+const roles = computed(() => {
+  return (
+    userStore.userInfo?.rolesInfo?.map((r: RoleInfo) => ({
+      description: r.description,
+      name: r.name,
+    })) || []
+  );
+});
+
 async function handleLogout() {
   await authStore.logout(false);
+}
+
+async function handleSwitchRole(roleName: string) {
+  await authStore.switchRole(roleName);
 }
 
 function handleNoticeClear() {
@@ -127,11 +148,13 @@ watch(
     <template #user-dropdown>
       <UserDropdown
         :avatar
+        :current-role="currentRole"
         :menus
+        :roles
         :text="userStore.userInfo?.realName"
-        description="ann.vben@gmail.com"
-        tag-text="Pro"
+        :description="userStore.userInfo?.desc"
         @logout="handleLogout"
+        @switch-role="handleSwitchRole"
       />
     </template>
     <template #notification>

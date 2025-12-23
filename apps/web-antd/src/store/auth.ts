@@ -1,3 +1,6 @@
+// ABOUTME: 认证状态管理，处理登录、登出、获取用户信息
+// ABOUTME: 包含角色切换功能，切换后刷新用户权限和菜单
+
 import type { Recordable, UserInfo } from '@vben/types';
 
 import { ref } from 'vue';
@@ -10,7 +13,13 @@ import { resetAllStores, useAccessStore, useUserStore } from '@vben/stores';
 import { notification } from 'ant-design-vue';
 import { defineStore } from 'pinia';
 
-import { getAccessCodesApi, getUserInfoApi, loginApi, logoutApi } from '#/api';
+import {
+  getAccessCodesApi,
+  getUserInfoApi,
+  loginApi,
+  logoutApi,
+  switchRoleApi,
+} from '#/api';
 import { $t } from '#/locales';
 
 export const useAuthStore = defineStore('auth', () => {
@@ -104,6 +113,42 @@ export const useAuthStore = defineStore('auth', () => {
     return userInfo;
   }
 
+  /**
+   * 切换用户角色
+   * @param roleName 目标角色名
+   */
+  async function switchRole(roleName: string) {
+    try {
+      // 1. 调用后端切换角色接口
+      await switchRoleApi({ roleName });
+
+      // 2. 重新获取用户信息
+      const userInfo = await fetchUserInfo();
+
+      // 3. 重置权限检查标志，触发重新生成路由
+      accessStore.setIsAccessChecked(false);
+
+      // 4. 重新导航以触发路由守卫刷新权限
+      const currentPath = router.currentRoute.value.path;
+      await router.replace({ path: currentPath });
+
+      notification.success({
+        description: `已切换到角色: ${roleName}`,
+        duration: 2,
+        message: '角色切换成功',
+      });
+
+      return userInfo;
+    } catch (error) {
+      notification.error({
+        description: '请稍后重试',
+        duration: 3,
+        message: '角色切换失败',
+      });
+      throw error;
+    }
+  }
+
   function $reset() {
     loginLoading.value = false;
   }
@@ -114,5 +159,6 @@ export const useAuthStore = defineStore('auth', () => {
     fetchUserInfo,
     loginLoading,
     logout,
+    switchRole,
   };
 });

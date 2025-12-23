@@ -1,4 +1,7 @@
 <script setup lang="ts">
+// ABOUTME: 用户下拉菜单组件，显示用户信息、角色切换、锁屏、退出登录
+// ABOUTME: 支持多角色用户在不同角色间切换权限视角
+
 import type { Component } from 'vue';
 
 import type { AnyFunction } from '@vben/types';
@@ -19,6 +22,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
@@ -30,11 +35,23 @@ import { useMagicKeys, whenever } from '@vueuse/core';
 
 import { LockScreenModal } from '../lock-screen';
 
+/** 角色信息 */
+interface RoleItem {
+  /** 角色描述 */
+  description?: string;
+  /** 角色名称 */
+  name: string;
+}
+
 interface Props {
   /**
    * 头像
    */
   avatar?: string;
+  /**
+   * 当前角色名称
+   */
+  currentRole?: string;
   /**
    * @zh_CN 描述
    */
@@ -51,7 +68,10 @@ interface Props {
     icon?: Component | Function | string;
     text: string;
   }>;
-
+  /**
+   * 用户拥有的所有角色
+   */
+  roles?: RoleItem[];
   /**
    * 标签文本
    */
@@ -72,9 +92,11 @@ defineOptions({
 
 const props = withDefaults(defineProps<Props>(), {
   avatar: '',
+  currentRole: '',
   description: '',
   enableShortcutKey: true,
   menus: () => [],
+  roles: () => [],
   showShortcutKey: true,
   tagText: '',
   text: '',
@@ -82,7 +104,10 @@ const props = withDefaults(defineProps<Props>(), {
   hoverDelay: 500,
 });
 
-const emit = defineEmits<{ logout: [] }>();
+const emit = defineEmits<{
+  logout: [];
+  switchRole: [roleName: string];
+}>();
 
 const { globalLockScreenShortcutKey, globalLogoutShortcutKey } =
   usePreferences();
@@ -131,6 +156,12 @@ const enableShortcutKey = computed(() => {
   return props.enableShortcutKey && preferences.shortcutKeys.enable;
 });
 
+// 是否可以切换角色（多于一个角色）
+const canSwitchRole = computed(() => props.roles.length > 1);
+
+// 是否显示角色区域
+const showRoles = computed(() => props.roles.length > 0);
+
 function handleOpenLock() {
   lockModalApi.open();
 }
@@ -149,6 +180,13 @@ function handleLogout() {
 function handleSubmitLogout() {
   emit('logout');
   logoutModalApi.close();
+}
+
+function handleSwitchRole(roleName: string) {
+  if (roleName !== props.currentRole && canSwitchRole.value) {
+    emit('switchRole', roleName);
+    openPopover.value = false;
+  }
 }
 
 if (enableShortcutKey.value) {
@@ -218,8 +256,9 @@ if (enableShortcutKey.value) {
                 </Badge>
               </slot>
             </div>
+            <!-- 当前角色或描述 -->
             <div class="text-muted-foreground text-xs font-normal">
-              {{ description }}
+              {{ currentRole || description }}
             </div>
           </div>
         </DropdownMenuLabel>
@@ -233,6 +272,36 @@ if (enableShortcutKey.value) {
           <VbenIcon :icon="menu.icon" class="mr-2 size-4" />
           {{ menu.text }}
         </DropdownMenuItem>
+
+        <!-- 角色切换区域 -->
+        <template v-if="showRoles">
+          <DropdownMenuSeparator />
+          <DropdownMenuLabel
+            class="text-muted-foreground px-2 py-1.5 text-xs font-normal"
+          >
+            {{ $t('ui.widgets.switchRole', '切换角色') }}
+          </DropdownMenuLabel>
+          <DropdownMenuRadioGroup :model-value="currentRole">
+            <DropdownMenuRadioItem
+              v-for="role in roles"
+              :key="role.name"
+              :value="role.name"
+              :disabled="!canSwitchRole"
+              class="mx-1"
+              :class="canSwitchRole ? 'cursor-pointer' : 'cursor-default'"
+              @click="handleSwitchRole(role.name)"
+            >
+              <span>{{ role.name }}</span>
+              <span
+                v-if="role.description"
+                class="text-muted-foreground ml-2 text-xs"
+              >
+                {{ role.description }}
+              </span>
+            </DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </template>
+
         <DropdownMenuSeparator />
         <DropdownMenuItem
           v-if="preferences.widget.lockScreen"

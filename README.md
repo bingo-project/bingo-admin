@@ -34,7 +34,11 @@ bingo-admin/
 └── docs/                  # 项目文档
 ```
 
-详细架构说明见 [docs/architecture.md](docs/architecture.md)。
+## 文档
+
+- [架构设计](docs/architecture.md) - 技术选型、分层架构、升级策略
+- [后端 API](docs/backend-api.md) - 接口定义位置、常用接口、数据结构
+- [实现计划](docs/plans/) - 功能开发计划
 
 ## 参考资料
 

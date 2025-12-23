@@ -1,3 +1,8 @@
+// ABOUTME: 认证相关 API，包括登录、登出、刷新 Token、切换角色
+// ABOUTME: 切换角色 API 用于多角色用户在不同角色间切换权限视角
+
+import type { AdminInfo } from './user';
+
 import { baseRequestClient, requestClient } from '#/api/request';
 
 export namespace AuthApi {
@@ -55,4 +60,18 @@ export async function getAccessCodesApi(): Promise<string[]> {
   // 权限码从 user-info 中获取，这里先返回空数组
   // 实际权限码会在 store/auth.ts 中从用户信息提取
   return [];
+}
+
+/** 切换角色请求参数 */
+export interface SwitchRoleParams {
+  roleName: string;
+}
+
+/**
+ * 切换当前角色
+ * @param data 包含目标角色名
+ * @returns 更新后的用户信息
+ */
+export async function switchRoleApi(data: SwitchRoleParams) {
+  return requestClient.put<AdminInfo>('/v1/auth/switch-role', data);
 }
