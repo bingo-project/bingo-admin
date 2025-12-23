@@ -24,6 +24,8 @@ export namespace SystemMenuApi {
   /** 系统菜单 */
   export interface SystemMenu {
     [key: string]: any;
+    /** 关联的 API ID 列表 */
+    apiIds?: number[];
     /** 后端权限标识 */
     authCode: string;
     /** 子级 */
@@ -85,6 +87,8 @@ export namespace SystemMenuApi {
     pid: string;
     /** 重定向 */
     redirect?: string;
+    /** 菜单状态：1-启用 0-禁用 */
+    status?: number;
     /** 菜单类型 */
     type: (typeof MenuTypes)[number];
   }
@@ -92,6 +96,8 @@ export namespace SystemMenuApi {
 
 /** 后端返回的菜单结构 */
 interface BackendMenu {
+  apiIds?: number[];
+  authCode?: string;
   children?: BackendMenu[];
   component: string;
   hidden: boolean;
@@ -102,7 +108,9 @@ interface BackendMenu {
   path: string;
   redirect?: string;
   sort: number;
+  status?: number;
   title: string;
+  type?: string;
 }
 
 /**
@@ -110,7 +118,8 @@ interface BackendMenu {
  */
 function transformMenuData(menu: BackendMenu): SystemMenuApi.SystemMenu {
   const result: SystemMenuApi.SystemMenu = {
-    authCode: '',
+    apiIds: menu.apiIds || [],
+    authCode: menu.authCode || '',
     component: menu.component,
     id: String(menu.id),
     meta: {
@@ -123,11 +132,12 @@ function transformMenuData(menu: BackendMenu): SystemMenuApi.SystemMenu {
     path: menu.path,
     pid: String(menu.parentID),
     redirect: menu.redirect,
-    type: 'menu',
+    status: menu.status ?? 1,
+    type: (menu.type as SystemMenuApi.SystemMenu['type']) || 'menu',
   };
 
   if (menu.children && menu.children.length > 0) {
-    result.children = menu.children.map(transformMenuData);
+    result.children = menu.children.map((child) => transformMenuData(child));
   }
 
   return result;
@@ -138,23 +148,23 @@ function transformMenuData(menu: BackendMenu): SystemMenuApi.SystemMenu {
  */
 async function getMenuList() {
   const data = await requestClient.get<BackendMenu[]>('/v1/menus/tree');
-  return data.map(transformMenuData);
+  return data.map((menu) => transformMenuData(menu));
 }
 
 async function isMenuNameExists(
-  name: string,
-  id?: SystemMenuApi.SystemMenu['id'],
+  _name: string,
+  _id?: SystemMenuApi.SystemMenu['id'],
 ) {
   // TODO: 后端暂无此接口，先返回 false
-  return Promise.resolve(false);
+  return false;
 }
 
 async function isMenuPathExists(
-  path: string,
-  id?: SystemMenuApi.SystemMenu['id'],
+  _path: string,
+  _id?: SystemMenuApi.SystemMenu['id'],
 ) {
   // TODO: 后端暂无此接口，先返回 false
-  return Promise.resolve(false);
+  return false;
 }
 
 /**
@@ -188,9 +198,32 @@ async function deleteMenu(id: string) {
   return requestClient.delete(`/v1/menus/${id}`);
 }
 
+/** API 信息 */
+export interface ApiInfo {
+  description: string;
+  group: string;
+  id: number;
+  method: string;
+  path: string;
+}
+
+/** API 分组 */
+export interface ApiGroup {
+  children: ApiInfo[];
+  key: string;
+}
+
+/**
+ * 获取 API 树形列表（按分组）
+ */
+async function getApiTree(): Promise<ApiGroup[]> {
+  return requestClient.get<ApiGroup[]>('/v1/apis/tree');
+}
+
 export {
   createMenu,
   deleteMenu,
+  getApiTree,
   getMenuList,
   isMenuNameExists,
   isMenuPathExists,

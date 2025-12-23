@@ -17,6 +17,7 @@ import { breakpointsTailwind, useBreakpoints } from '@vueuse/core';
 import { useVbenForm, z } from '#/adapter/form';
 import {
   createMenu,
+  getApiTree,
   getMenuList,
   isMenuNameExists,
   isMenuPathExists,
@@ -250,6 +251,39 @@ const schema: VbenFormSchema[] = [
     },
     fieldName: 'authCode',
     label: $t('system.menu.authCode'),
+  },
+  {
+    component: 'ApiSelect',
+    componentProps: {
+      api: async () => {
+        const groups = await getApiTree();
+        // 将分组结构转换为扁平选项，使用 ID 作为值
+        const options: Array<{ label: string; value: number }> = [];
+        for (const group of groups) {
+          for (const api of group.children || []) {
+            options.push({
+              label: `[${api.method}] ${api.path} - ${api.description}`,
+              value: api.id,
+            });
+          }
+        }
+        return options;
+      },
+      class: 'w-full',
+      getPopupContainer,
+      mode: 'multiple',
+      placeholder: $t('system.menu.apisPlaceholder', '请选择关联的 API'),
+      showSearch: true,
+    },
+    dependencies: {
+      show: (values) => {
+        return ['button', 'menu'].includes(values.type);
+      },
+      triggerFields: ['type'],
+    },
+    fieldName: 'apiIds',
+    formItemClass: 'col-span-2 md:col-span-2',
+    label: $t('system.menu.apis', '关联 API'),
   },
   {
     component: 'RadioGroup',
