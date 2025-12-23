@@ -177,13 +177,30 @@ async function isMenuPathExists(
 }
 
 /**
+ * 将前端菜单数据转换为后端期望的格式
+ */
+function transformToBackendMenu(
+  data: Omit<SystemMenuApi.SystemMenu, 'children' | 'id'>,
+) {
+  return {
+    ...data,
+    hidden: data.meta?.hideInMenu ?? false,
+    icon: data.meta?.icon ?? '',
+    parentId: data.pid ? Number(data.pid) : 0,
+    sort: data.meta?.order ?? 0,
+    status: data.status === 1 ? 'enabled' : 'disabled',
+    title: data.meta?.title ?? '',
+  };
+}
+
+/**
  * 创建菜单
  * @param data 菜单数据
  */
 async function createMenu(
   data: Omit<SystemMenuApi.SystemMenu, 'children' | 'id'>,
 ) {
-  return requestClient.post('/v1/menus', data);
+  return requestClient.post('/v1/menus', transformToBackendMenu(data));
 }
 
 /**
@@ -196,7 +213,7 @@ async function updateMenu(
   id: string,
   data: Omit<SystemMenuApi.SystemMenu, 'children' | 'id'>,
 ) {
-  return requestClient.put(`/v1/menus/${id}`, data);
+  return requestClient.put(`/v1/menus/${id}`, transformToBackendMenu(data));
 }
 
 /**

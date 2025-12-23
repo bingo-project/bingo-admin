@@ -4,19 +4,23 @@ import type {
   VxeTableGridOptions,
 } from '#/adapter/vxe-table';
 
+import { ref } from 'vue';
+
 import { Page, useVbenDrawer } from '@vben/common-ui';
 import { IconifyIcon, Plus } from '@vben/icons';
 import { $t } from '@vben/locales';
 
 import { MenuBadge } from '@vben-core/menu-ui';
 
-import { Button, message } from 'ant-design-vue';
+import { Button, message, Tooltip } from 'ant-design-vue';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
 import { deleteMenu, getMenuList, SystemMenuApi } from '#/api/system/menu';
 
 import { useColumns } from './data';
 import Form from './modules/form.vue';
+
+const isExpanded = ref(true);
 
 const [FormDrawer, formDrawerApi] = useVbenDrawer({
   connectedComponent: Form,
@@ -110,6 +114,18 @@ function onDelete(row: SystemMenuApi.SystemMenu) {
       hideLoading();
     });
 }
+
+function onToggleExpand() {
+  isExpanded.value = !isExpanded.value;
+  const $grid = gridApi.grid;
+  if ($grid) {
+    if (isExpanded.value) {
+      $grid.setAllTreeExpand(true);
+    } else {
+      $grid.clearTreeExpand();
+    }
+  }
+}
 </script>
 <template>
   <Page auto-content-height>
@@ -120,6 +136,16 @@ function onDelete(row: SystemMenuApi.SystemMenu) {
           <Plus class="size-5" />
           {{ $t('ui.actionTitle.create', [$t('system.menu.name')]) }}
         </Button>
+        <Tooltip
+          :title="isExpanded ? $t('common.collapseAll') : $t('common.expandAll')"
+        >
+          <Button class="ml-2" shape="circle" @click="onToggleExpand">
+            <IconifyIcon
+              :icon="isExpanded ? 'carbon:collapse-all' : 'carbon:expand-all'"
+              class="size-4"
+            />
+          </Button>
+        </Tooltip>
       </template>
       <template #title="{ row }">
         <div class="flex w-full items-center gap-1">
