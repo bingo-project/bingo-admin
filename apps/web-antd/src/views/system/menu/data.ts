@@ -21,6 +21,13 @@ export function getMenuTypeOptions() {
   ];
 }
 
+export function getMenuStatusOptions() {
+  return [
+    { color: 'success', label: $t('common.enabled'), value: 1 },
+    { color: 'error', label: $t('common.disabled'), value: 0 },
+  ];
+}
+
 export function useColumns(
   onActionClick: OnActionClickFn<SystemMenuApi.SystemMenu>,
 ): VxeTableGridOptions<SystemMenuApi.SystemMenu>['columns'] {
@@ -75,7 +82,7 @@ export function useColumns(
       title: $t('system.menu.component'),
     },
     {
-      cellRender: { name: 'CellTag' },
+      cellRender: { name: 'CellTag', options: getMenuStatusOptions() },
       field: 'status',
       title: $t('system.menu.status'),
       width: 100,

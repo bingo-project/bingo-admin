@@ -19,13 +19,17 @@ cat ../bingo/api/swagger/admserver/swagger.yaml
 
 ### 方式 2: 使用 Swagger UI
 
-如果后端服务运行中，通常可以访问：
+后端服务运行时访问：
 
 ```
-http://localhost:8080/swagger/index.html
+http://localhost:18080/api/docs/index.html
 ```
 
-（具体端口根据后端配置而定）
+Swagger JSON 文档：
+
+```
+http://localhost:18080/api/docs/doc.json
+```
 
 ### 方式 3: 在线 Swagger Editor
 
@@ -69,14 +73,33 @@ http://localhost:8080/swagger/index.html
 
 ### 菜单管理 (Menu)
 
-| 接口             | 方法   | 说明         |
-| ---------------- | ------ | ------------ |
-| `/v1/menus`      | GET    | 菜单列表     |
-| `/v1/menus`      | POST   | 创建菜单     |
-| `/v1/menus/{id}` | GET    | 获取菜单详情 |
-| `/v1/menus/{id}` | PUT    | 更新菜单     |
-| `/v1/menus/{id}` | DELETE | 删除菜单     |
-| `/v1/menus/tree` | GET    | 获取菜单树   |
+| 接口                       | 方法   | 说明           |
+| -------------------------- | ------ | -------------- |
+| `/v1/menus`                | GET    | 菜单列表       |
+| `/v1/menus`                | POST   | 创建菜单       |
+| `/v1/menus/{id}`           | GET    | 获取菜单详情   |
+| `/v1/menus/{id}`           | PUT    | 更新菜单       |
+| `/v1/menus/{id}`           | DELETE | 删除菜单       |
+| `/v1/menus/tree`           | GET    | 获取菜单树     |
+| `/v1/menus/{id}/toggle-hidden` | POST | 切换隐藏状态 |
+
+**注意**：
+- `/v1/menus/tree` 返回的数据不包含 `apiIds` 字段
+- `/v1/menus/{id}` 返回的详情包含 `apiIds` 字段（关联的 API ID 列表）
+- `status` 字段为字符串类型：`"enabled"` 或 `"disabled"`
+- `parentId` 字段为父级菜单 ID
+
+### API 管理 (Api)
+
+| 接口             | 方法   | 说明           |
+| ---------------- | ------ | -------------- |
+| `/v1/apis`       | GET    | API 列表       |
+| `/v1/apis`       | POST   | 创建 API       |
+| `/v1/apis/{id}`  | GET    | 获取 API 详情  |
+| `/v1/apis/{id}`  | PUT    | 更新 API       |
+| `/v1/apis/{id}`  | DELETE | 删除 API       |
+| `/v1/apis/all`   | GET    | 获取所有 API   |
+| `/v1/apis/tree`  | GET    | 获取 API 树（按分组） |
 
 ## 关键数据结构
 

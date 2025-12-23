@@ -104,11 +104,11 @@ interface BackendMenu {
   icon: string;
   id: number;
   name: string;
-  parentID: number;
+  parentId: number;
   path: string;
   redirect?: string;
   sort: number;
-  status?: number;
+  status?: string;
   title: string;
   type?: string;
 }
@@ -130,9 +130,9 @@ function transformMenuData(menu: BackendMenu): SystemMenuApi.SystemMenu {
     },
     name: menu.name,
     path: menu.path,
-    pid: String(menu.parentID),
+    pid: String(menu.parentId),
     redirect: menu.redirect,
-    status: menu.status ?? 1,
+    status: menu.status === 'enabled' ? 1 : 0,
     type: (menu.type as SystemMenuApi.SystemMenu['type']) || 'menu',
   };
 
@@ -149,6 +149,15 @@ function transformMenuData(menu: BackendMenu): SystemMenuApi.SystemMenu {
 async function getMenuList() {
   const data = await requestClient.get<BackendMenu[]>('/v1/menus/tree');
   return data.map((menu) => transformMenuData(menu));
+}
+
+/**
+ * 获取菜单详情
+ * @param id 菜单 ID
+ */
+async function getMenuDetail(id: string) {
+  const data = await requestClient.get<BackendMenu>(`/v1/menus/${id}`);
+  return transformMenuData(data);
 }
 
 async function isMenuNameExists(
@@ -224,6 +233,7 @@ export {
   createMenu,
   deleteMenu,
   getApiTree,
+  getMenuDetail,
   getMenuList,
   isMenuNameExists,
   isMenuPathExists,

@@ -18,6 +18,7 @@ import { useVbenForm, z } from '#/adapter/form';
 import {
   createMenu,
   getApiTree,
+  getMenuDetail,
   getMenuList,
   isMenuNameExists,
   isMenuPathExists,
@@ -482,9 +483,19 @@ const [Form, formApi] = useVbenForm({
 
 const [Drawer, drawerApi] = useVbenDrawer({
   onConfirm: onSubmit,
-  onOpenChange(isOpen) {
+  async onOpenChange(isOpen) {
     if (isOpen) {
-      const data = drawerApi.getData<SystemMenuApi.SystemMenu>();
+      let data = drawerApi.getData<SystemMenuApi.SystemMenu>();
+
+      // 编辑模式：调用详情接口获取完整数据（包含 apiIds）
+      if (data?.id) {
+        try {
+          data = await getMenuDetail(data.id);
+        } catch {
+          // 获取详情失败时使用传入的数据
+        }
+      }
+
       if (data?.type === 'link') {
         data.linkSrc = data.meta?.link;
       } else if (data?.type === 'embedded') {
