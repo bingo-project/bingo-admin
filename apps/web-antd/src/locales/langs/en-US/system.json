@@ -62,5 +62,26 @@
     "operation": "Operation",
     "permissions": "Permissions",
     "setPermissions": "Permissions"
+  },
+  "admin": {
+    "title": "Admin",
+    "list": "Admin List",
+    "name": "Admin",
+    "username": "Username",
+    "nickname": "Nickname",
+    "email": "Email",
+    "phone": "Phone",
+    "avatar": "Avatar",
+    "status": "Status",
+    "roles": "Roles",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "createdAt": "Created At",
+    "operation": "Operation",
+    "resetPassword": "Reset Password",
+    "resetPasswordTitle": "Reset Password",
+    "resetPasswordConfirm": "Are you sure to reset the password of {0}?",
+    "resetPasswordSuccess": "Password reset successfully",
+    "passwordMismatch": "The passwords do not match"
   }
 }

@@ -9,7 +9,7 @@ import { setupVbenVxeTable, useVbenVxeGrid } from '@vben/plugins/vxe-table';
 import { get, isFunction, isString } from '@vben/utils';
 
 import { objectOmit } from '@vueuse/core';
-import { Button, Image, Popconfirm, Switch, Tag } from 'ant-design-vue';
+import { Button, Image, Popconfirm, Select, Switch, Tag } from 'ant-design-vue';
 
 import { $t } from '#/locales';
 
@@ -61,6 +61,81 @@ setupVbenVxeTable({
           Button,
           { size: 'small', type: 'link' },
           { default: () => props?.text },
+        );
+      },
+    });
+
+    // 单元格渲染：Tags（多个标签）
+    vxeUI.renderer.add('CellTags', {
+      renderTableDefault({ attrs, props }, { column, row }) {
+        const value = get(row, column.field);
+        if (!Array.isArray(value) || value.length === 0) {
+          return h('span', { class: 'text-gray-400' }, '-');
+        }
+        const nameField = props?.nameField || 'name';
+        const color = props?.color || 'processing';
+        const clickable = props?.clickable && attrs?.onClick;
+        return h(
+          'div',
+          {
+            class: `flex flex-wrap gap-1 ${clickable ? 'cursor-pointer' : ''}`,
+            onClick: clickable ? () => attrs.onClick(row) : undefined,
+          },
+          value.map((item) =>
+            h(
+              Tag,
+              { color, key: item[nameField] || item },
+              { default: () => item[nameField] || item },
+            ),
+          ),
+        );
+      },
+    });
+
+    // 单元格渲染：Tags 行内编辑
+    vxeUI.renderer.add('CellTagsEdit', {
+      renderTableDefault({ attrs, options, props }, { column, row }) {
+        const value = get(row, column.field);
+        const nameField = props?.nameField || 'name';
+        const loadingKey = `__loading_${column.field}`;
+
+        const selectedValues = Array.isArray(value)
+          ? value.map((item) => item[nameField] || item)
+          : [];
+
+        async function onSelectChange(newValues: string[]) {
+          row[loadingKey] = true;
+          try {
+            await attrs?.onChange?.(newValues, row);
+          } finally {
+            row[loadingKey] = false;
+          }
+        }
+
+        return h(
+          Select as any,
+          {
+            loading: row[loadingKey] ?? false,
+            maxTagCount: 'responsive',
+            mode: 'multiple',
+            onChange: onSelectChange,
+            optionLabelProp: 'label',
+            options: options || [],
+            placeholder: '请选择',
+            size: 'small',
+            style: { width: '100%' },
+            value: selectedValues,
+            ...props,
+          },
+          {
+            option: (opt: { description?: string; label: string }) =>
+              h('div', { class: 'flex items-center justify-between w-full' }, [
+                h('span', {}, opt.label),
+                opt.description
+                  ? h('span', { class: 'text-gray-400 text-xs' }, opt.description)
+                  : null,
+              ]),
+          },
         );
       },
     });

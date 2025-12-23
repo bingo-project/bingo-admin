@@ -10,7 +10,7 @@ import { LOGIN_PATH } from '@vben/constants';
 import { preferences } from '@vben/preferences';
 import { resetAllStores, useAccessStore, useUserStore } from '@vben/stores';
 
-import { notification } from 'ant-design-vue';
+import { message, notification } from 'ant-design-vue';
 import { defineStore } from 'pinia';
 
 import {
@@ -132,19 +132,11 @@ export const useAuthStore = defineStore('auth', () => {
       const currentPath = router.currentRoute.value.path;
       await router.replace({ path: currentPath });
 
-      notification.success({
-        description: `已切换到角色: ${roleName}`,
-        duration: 2,
-        message: '角色切换成功',
-      });
+      message.success(`已切换到角色: ${roleName}`);
 
       return userInfo;
     } catch (error) {
-      notification.error({
-        description: '请稍后重试',
-        duration: 3,
-        message: '角色切换失败',
-      });
+      message.error('角色切换失败，请稍后重试');
       throw error;
     }
   }

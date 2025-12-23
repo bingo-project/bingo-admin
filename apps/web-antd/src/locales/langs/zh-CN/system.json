@@ -64,5 +64,26 @@
     "operation": "操作",
     "permissions": "权限",
     "setPermissions": "授权"
+  },
+  "admin": {
+    "title": "管理员",
+    "list": "管理员列表",
+    "name": "管理员",
+    "username": "用户名",
+    "nickname": "昵称",
+    "email": "邮箱",
+    "phone": "手机号",
+    "avatar": "头像",
+    "status": "状态",
+    "roles": "角色",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "createdAt": "创建时间",
+    "operation": "操作",
+    "resetPassword": "重置密码",
+    "resetPasswordTitle": "重置密码",
+    "resetPasswordConfirm": "确定要重置 {0} 的密码吗？",
+    "resetPasswordSuccess": "密码重置成功",
+    "passwordMismatch": "两次输入的密码不一致"
   }
 }
