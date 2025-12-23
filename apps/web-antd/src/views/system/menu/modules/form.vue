@@ -257,21 +257,24 @@ const schema: VbenFormSchema[] = [
     componentProps: {
       api: async () => {
         const groups = await getApiTree();
-        // 将分组结构转换为扁平选项，使用 ID 作为值
-        const options: Array<{ label: string; value: number }> = [];
-        for (const group of groups) {
-          for (const api of group.children || []) {
-            options.push({
-              label: `[${api.method}] ${api.path} - ${api.description}`,
-              value: api.id,
-            });
-          }
-        }
-        return options;
+        // 按分组展示，使用 OptGroup 结构
+        return groups.map((group) => ({
+          label: group.key,
+          options: (group.children || []).map((api) => ({
+            label: `[${api.method}] ${api.path} - ${api.description}`,
+            value: api.id,
+          })),
+        }));
       },
       class: 'w-full',
+      filterOption: (input: string, option: { label?: string }) => {
+        if (!input) return true;
+        const label = option.label || '';
+        return label.toLowerCase().includes(input.toLowerCase());
+      },
       getPopupContainer,
       mode: 'multiple',
+      optionFilterProp: 'label',
       placeholder: $t('system.menu.apisPlaceholder', '请选择关联的 API'),
       showSearch: true,
     },
