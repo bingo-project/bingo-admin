@@ -11,7 +11,7 @@
 
 ## 方案
 
-将菜单扩展到按钮级别，每个按钮关联对应的 API。配置角色菜单权限时，自动同步关联的 API 权限到 Casbin。
+将菜单扩展到按钮级别，每个按钮关联对应的 API ID。配置角色菜单权限时，自动同步关联的 API 权限到 Casbin。
 
 ```
 菜单权限（含按钮） → 控制前端 UI 显示/隐藏
@@ -21,15 +21,13 @@ API 权限（Casbin） → 控制后端接口访问
 
 ## 现状分析
 
-### 前端已有字段
+### 前端已支持字段
 
-前端菜单管理已支持以下字段：
-
-| 字段       | 状态    | 说明                     |
-| ---------- | ------- | ------------------------ |
-| `type`     | ✅ 已有 | 菜单类型                 |
-| `authCode` | ✅ 已有 | 权限标识（按钮类型必填） |
-| `apis`     | ❌ 缺少 | 关联的 API 列表          |
+| 字段       | 状态     | 说明                     |
+| ---------- | -------- | ------------------------ |
+| `type`     | ✅ 已有  | 菜单类型                 |
+| `authCode` | ✅ 已有  | 权限标识（按钮类型必填） |
+| `apiIds`   | ✅ 已实现 | 关联的 API ID 列表       |
 
 ### 前端菜单类型定义
 
@@ -45,69 +43,23 @@ API 权限（Casbin） → 控制后端接口访问
 
 ### 1. 菜单表新增字段
 
-只需新增 `apis` 字段（`type` 和 `authCode` 如果后端已有则无需添加）：
-
-| 字段 | 类型 | 说明 | 示例 |
-| --- | --- | --- | --- |
-| `type` | string | 菜单类型（如已有则跳过） | `catalog` / `menu` / `button` / `embedded` / `link` |
-| `authCode` | string | 权限标识（如已有则跳过） | `System:User:Create` |
-| `apis` | []string | **新增** - 关联的 API 列表 | `["POST\|/v1/users", "GET\|/v1/users/:name"]` |
-
-#### apis 字段格式
-
-格式：`METHOD|/path/:param`
-
-- 分隔符使用 `|`（避免与路径参数 `:name` 冲突）
-- 路径参数使用 Gin 风格 `:param`
-- 支持通配符（由 Casbin 处理匹配）
-
-示例：
-
-```json
-{
-  "apis": [
-    "POST|/v1/users",
-    "GET|/v1/users/:name",
-    "PUT|/v1/users/:name",
-    "DELETE|/v1/users/:name"
-  ]
-}
-```
-
-#### authCode 权限标识格式
-
-格式：`Module:Resource:Action`
-
-| 示例                 | 说明                       |
-| -------------------- | -------------------------- |
-| `System:User:List`   | 系统模块-用户资源-列表操作 |
-| `System:User:Create` | 系统模块-用户资源-创建操作 |
-| `System:User:Update` | 系统模块-用户资源-更新操作 |
-| `System:User:Delete` | 系统模块-用户资源-删除操作 |
+| 字段       | 类型     | 说明                           | 示例               |
+| ---------- | -------- | ------------------------------ | ------------------ |
+| `type`     | string   | 菜单类型（如已有则跳过）       | `catalog` / `menu` / `button` / `embedded` / `link` |
+| `authCode` | string   | 权限标识（如已有则跳过）       | `System:User:Create` |
+| `apiIds`   | []int    | **新增** - 关联的 API ID 列表  | `[1, 2, 3]`        |
 
 ### 2. 菜单接口调整
 
-#### CreateMenuRequest 扩展
+#### CreateMenuRequest / UpdateMenuRequest 扩展
 
 ```go
 type CreateMenuRequest struct {
     // ... 原有字段 ...
 
-    Type     string   `json:"type" binding:"omitempty,oneof=catalog menu button embedded link"`
-    AuthCode string   `json:"authCode" binding:"omitempty,max=100"`
-    Apis     []string `json:"apis" binding:"omitempty,dive,max=255"`  // 新增
-}
-```
-
-#### UpdateMenuRequest 扩展
-
-```go
-type UpdateMenuRequest struct {
-    // ... 原有字段 ...
-
-    Type     string   `json:"type" binding:"omitempty,oneof=catalog menu button embedded link"`
-    AuthCode string   `json:"authCode" binding:"omitempty,max=100"`
-    Apis     []string `json:"apis" binding:"omitempty,dive,max=255"`  // 新增
+    Type     string `json:"type" binding:"omitempty,oneof=catalog menu button embedded link"`
+    AuthCode string `json:"authCode" binding:"omitempty,max=100"`
+    ApiIds   []int  `json:"apiIds" binding:"omitempty"`  // 新增
 }
 ```
 
@@ -117,17 +69,15 @@ type UpdateMenuRequest struct {
 type MenuInfo struct {
     // ... 原有字段 ...
 
-    Type     string   `json:"type"`
-    AuthCode string   `json:"authCode"`
-    Apis     []string `json:"apis"`  // 新增
+    Type     string `json:"type"`
+    AuthCode string `json:"authCode"`
+    ApiIds   []int  `json:"apiIds"`  // 新增
 }
 ```
 
 ### 3. 角色权限保存逻辑调整
 
 #### 设置角色菜单权限 `PUT /v1/roles/{name}/menus`
-
-修改逻辑：
 
 ```go
 func SetRoleMenus(roleName string, menuIds []int) error {
@@ -136,40 +86,38 @@ func SetRoleMenus(roleName string, menuIds []int) error {
         return err
     }
 
-    // 2. 提取关联的 APIs
-    apis := extractApisFromMenus(menuIds)
+    // 2. 提取关联的 API IDs
+    apiIds := extractApiIdsFromMenus(menuIds)
 
-    // 3. 同步到 Casbin
-    if err := syncRoleApis(roleName, apis); err != nil {
+    // 3. 根据 API ID 获取 API 信息，同步到 Casbin
+    if err := syncRoleApisByIds(roleName, apiIds); err != nil {
         return err
     }
 
     return nil
 }
 
-func extractApisFromMenus(menuIds []int) []string {
-    var apis []string
+func extractApiIdsFromMenus(menuIds []int) []int {
+    var apiIds []int
     menus := getMenusByIds(menuIds)
     for _, menu := range menus {
-        if len(menu.Apis) > 0 {
-            apis = append(apis, menu.Apis...)
+        if len(menu.ApiIds) > 0 {
+            apiIds = append(apiIds, menu.ApiIds...)
         }
     }
-    // 去重
-    return unique(apis)
+    return unique(apiIds)
 }
 
-func syncRoleApis(roleName string, apis []string) error {
+func syncRoleApisByIds(roleName string, apiIds []int) error {
     // 清除角色原有 API 权限
     enforcer.DeletePermissionsForUser(roleName)
 
+    // 根据 ID 获取 API 信息
+    apis := getApisByIds(apiIds)
+
     // 添加新的 API 权限
     for _, api := range apis {
-        parts := strings.SplitN(api, "|", 2)
-        if len(parts) == 2 {
-            method, path := parts[0], parts[1]
-            enforcer.AddPermissionForUser(roleName, path, method)
-        }
+        enforcer.AddPermissionForUser(roleName, api.Path, api.Method)
     }
 
     return nil
@@ -179,37 +127,30 @@ func syncRoleApis(roleName string, apis []string) error {
 ### 4. 数据库迁移
 
 ```sql
--- 菜单表添加 apis 字段（type 和 auth_code 如已有则跳过）
+-- 菜单表添加 apiIds 字段（type 和 auth_code 如已有则跳过）
 -- 如果 type 字段不存在：
 ALTER TABLE menus ADD COLUMN type VARCHAR(20) DEFAULT 'menu' COMMENT '菜单类型: catalog/menu/button/embedded/link';
 
 -- 如果 auth_code 字段不存在：
 ALTER TABLE menus ADD COLUMN auth_code VARCHAR(100) DEFAULT '' COMMENT '权限标识';
 
--- 新增 apis 字段（必须添加）
-ALTER TABLE menus ADD COLUMN apis JSON COMMENT '关联的API列表';
+-- 新增 api_ids 字段（必须添加）
+ALTER TABLE menus ADD COLUMN api_ids JSON COMMENT '关联的 API ID 列表';
 
 -- 添加索引（如有需要）
 CREATE INDEX idx_menus_type ON menus(type);
 CREATE INDEX idx_menus_auth_code ON menus(auth_code);
 ```
 
-## 前端改动
+## 前端改动（已完成）
 
 ### 1. 菜单管理页面
 
-现有页面已支持 `type` 和 `authCode`，只需新增：
+- ✅ 当 `type` 为 `menu` 或 `button` 时，显示 `apiIds` 多选组件
+- ✅ 从 `/v1/apis/tree` 获取可选的 API 列表
+- ✅ 选中后存储 API ID 数组
 
-- 当 `type` 为 `menu` 或 `button` 时，显示 `apis` 多选组件
-- 从 `/v1/apis/tree` 获取可选的 API 列表
-- 选中后格式化为 `METHOD|/path` 存储
-
-### 2. 角色权限配置
-
-- 菜单树展示时包含按钮类型节点
-- 勾选按钮时显示其关联的 API（只读提示，让管理员了解授予了哪些接口权限）
-
-### 3. 按钮权限控制
+### 2. 按钮权限控制
 
 使用 Vben 的权限指令（已支持）：
 
@@ -237,28 +178,28 @@ CREATE INDEX idx_menus_auth_code ON menus(auth_code);
       "type": "menu",
       "path": "/system/user",
       "authCode": "System:User:List",
-      "apis": ["GET|/v1/admins"],
+      "apiIds": [1],
       "children": [
         {
           "id": 3,
           "title": "新增",
           "type": "button",
           "authCode": "System:User:Create",
-          "apis": ["POST|/v1/admins"]
+          "apiIds": [2]
         },
         {
           "id": 4,
           "title": "编辑",
           "type": "button",
           "authCode": "System:User:Update",
-          "apis": ["PUT|/v1/admins/:name"]
+          "apiIds": [3]
         },
         {
           "id": 5,
           "title": "删除",
           "type": "button",
           "authCode": "System:User:Delete",
-          "apis": ["DELETE|/v1/admins/:name"]
+          "apiIds": [4]
         }
       ]
     }
@@ -268,8 +209,7 @@ CREATE INDEX idx_menus_auth_code ON menus(auth_code);
 
 ## 实施步骤
 
-1. **后端**：菜单表添加字段，更新 CRUD 接口
-2. **后端**：修改 `SetRoleMenus` 逻辑，自动同步 API 权限
-3. **前端**：菜单管理页面支持 type/authCode/apis 编辑
-4. **前端**：角色权限配置展示按钮节点
-5. **数据迁移**：为现有菜单补充 type 字段默认值
+1. ✅ **前端**：菜单管理页面支持 apiIds 编辑
+2. ⏳ **后端**：菜单表添加 apiIds 字段，更新 CRUD 接口
+3. ⏳ **后端**：修改 `SetRoleMenus` 逻辑，自动同步 API 权限到 Casbin
+4. ⏳ **前端**：角色权限配置展示按钮节点（可选）
