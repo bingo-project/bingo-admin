@@ -262,17 +262,6 @@ if (enableShortcutKey.value) {
             </div>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator v-if="menus?.length" />
-        <DropdownMenuItem
-          v-for="menu in menus"
-          :key="menu.text"
-          class="mx-1 flex cursor-pointer items-center rounded-sm py-1 leading-8"
-          @click="menu.handler"
-        >
-          <VbenIcon :icon="menu.icon" class="mr-2 size-4" />
-          {{ menu.text }}
-        </DropdownMenuItem>
-
         <!-- 角色切换区域 -->
         <template v-if="showRoles">
           <DropdownMenuSeparator />
@@ -287,7 +276,7 @@ if (enableShortcutKey.value) {
               :key="role.name"
               :value="role.name"
               :disabled="!canSwitchRole"
-              class="mx-1"
+              class="mx-1 [&_svg]:text-green-500"
               :class="canSwitchRole ? 'cursor-pointer' : 'cursor-default'"
               @click="handleSwitchRole(role.name)"
             >
@@ -301,6 +290,17 @@ if (enableShortcutKey.value) {
             </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </template>
+
+        <DropdownMenuSeparator v-if="menus?.length" />
+        <DropdownMenuItem
+          v-for="menu in menus"
+          :key="menu.text"
+          class="mx-1 flex cursor-pointer items-center rounded-sm py-1 leading-8"
+          @click="menu.handler"
+        >
+          <VbenIcon :icon="menu.icon" class="mr-2 size-4" />
+          {{ menu.text }}
+        </DropdownMenuItem>
 
         <DropdownMenuSeparator />
         <DropdownMenuItem
