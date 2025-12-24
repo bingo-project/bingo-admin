@@ -3,6 +3,7 @@ import type { Recordable } from '@vben/types';
 
 import { h } from 'vue';
 
+import { useAccess } from '@vben/access';
 import { IconifyIcon } from '@vben/icons';
 import { $te } from '@vben/locales';
 import { setupVbenVxeTable, useVbenVxeGrid } from '@vben/plugins/vxe-table';
@@ -192,6 +193,7 @@ setupVbenVxeTable({
     // 单元格渲染：操作按钮
     vxeUI.renderer.add('CellOperation', {
       renderTableDefault({ attrs, options, props }, { column, row }) {
+        const { hasAccessByCodes } = useAccess();
         const defaultProps = { size: 'small', type: 'link', ...props };
         let align = 'end';
         switch (column.align) {
@@ -240,7 +242,12 @@ setupVbenVxeTable({
             });
             return optBtn;
           })
-          .filter((opt) => opt.show !== false);
+          .filter((opt) => {
+            if (opt.auth && !hasAccessByCodes([opt.auth])) {
+              return false;
+            }
+            return opt.show !== false;
+          });
 
         function renderBtn(opt: Recordable<any>, listen = true) {
           return h(

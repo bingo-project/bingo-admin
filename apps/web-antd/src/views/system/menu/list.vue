@@ -132,7 +132,11 @@ function onToggleExpand() {
     <FormDrawer @success="onRefresh" />
     <Grid>
       <template #toolbar-tools>
-        <Button type="primary" @click="onCreate">
+        <Button
+          v-access:code="'System:Menu:Create'"
+          type="primary"
+          @click="onCreate"
+        >
           <Plus class="size-5" />
           {{ $t('ui.actionTitle.create', [$t('system.menu.name')]) }}
         </Button>

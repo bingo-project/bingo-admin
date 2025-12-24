@@ -98,11 +98,12 @@ export function useColumns(
         name: 'CellOperation',
         options: [
           {
+            auth: 'System:Menu:Create',
             code: 'append',
             text: '新增下级',
           },
-          'edit', // 默认的编辑按钮
-          'delete', // 默认的删除按钮
+          { auth: 'System:Menu:Edit', code: 'edit' },
+          { auth: 'System:Menu:Delete', code: 'delete' },
         ],
       },
       field: 'operation',
