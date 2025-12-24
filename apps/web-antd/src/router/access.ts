@@ -5,6 +5,7 @@ import type {
 
 import { generateAccessible } from '@vben/access';
 import { preferences } from '@vben/preferences';
+import { useAccessStore } from '@vben/stores';
 
 import { message } from 'ant-design-vue';
 
@@ -29,7 +30,11 @@ async function generateAccess(options: GenerateMenuAndRoutesOptions) {
         content: `${$t('common.loadingMenu')}...`,
         duration: 1.5,
       });
-      return await getAllMenusApi();
+      const { authCodes, menus } = await getAllMenusApi();
+      // 从菜单中提取的权限码设置到 store
+      const accessStore = useAccessStore();
+      accessStore.setAccessCodes(authCodes);
+      return menus;
     },
     // 可以指定没有权限跳转403页面
     forbiddenComponent,
