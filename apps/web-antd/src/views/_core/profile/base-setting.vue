@@ -50,7 +50,7 @@ onMounted(async () => {
 });
 
 async function handleSubmit(values: Record<string, any>) {
-  const username = userStore.userInfo?.username;
+  const username = values.username || userStore.userInfo?.username;
   if (!username) {
     message.error('用户信息获取失败');
     return;

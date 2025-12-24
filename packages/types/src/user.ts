@@ -26,9 +26,17 @@ interface UserInfo extends BasicUserInfo {
    */
   desc: string;
   /**
+   * 邮箱
+   */
+  email?: string;
+  /**
    * 首页地址
    */
   homePath: string;
+  /**
+   * 手机号
+   */
+  phone?: string;
   /**
    * 角色详细信息列表（用于角色切换）
    */

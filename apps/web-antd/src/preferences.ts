@@ -8,8 +8,8 @@ import { defineOverridesPreferences } from '@vben/preferences';
 export const overridesPreferences = defineOverridesPreferences({
   // overrides
   app: {
-    // 使用后端返回的菜单生成路由
-    accessMode: 'backend',
+    // 使用混合模式：后端菜单 + 前端静态路由（如个人中心等）
+    accessMode: 'mixed',
     name: import.meta.env.VITE_APP_TITLE,
   },
 });
