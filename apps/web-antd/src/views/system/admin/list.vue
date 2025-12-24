@@ -10,24 +10,16 @@ import type {
 } from '#/adapter/vxe-table';
 import type { SystemAdminApi } from '#/api';
 
-import { onMounted, ref } from 'vue';
-
 import { Page, useVbenDrawer, useVbenModal } from '@vben/common-ui';
 import { Plus } from '@vben/icons';
 
 import { Button, message, Modal } from 'ant-design-vue';
 
 import { toApiPagination, useVbenVxeGrid } from '#/adapter/vxe-table';
-import {
-  deleteAdmin,
-  getAdminList,
-  getAllRoles,
-  setAdminRoles,
-  updateAdmin,
-} from '#/api';
+import { deleteAdmin, getAdminList, updateAdmin } from '#/api';
 import { $t } from '#/locales';
 
-import { type RoleOption, useColumns, useGridFormSchema } from './data';
+import { useColumns, useGridFormSchema } from './data';
 import Form from './modules/form.vue';
 import ResetPassword from './modules/reset-password.vue';
 
@@ -40,8 +32,6 @@ const [ResetPasswordModal, resetPasswordModalApi] = useVbenModal({
   connectedComponent: ResetPassword,
   destroyOnClose: true,
 });
-
-const roleOptions = ref<RoleOption[]>([]);
 
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
@@ -73,27 +63,6 @@ const [Grid, gridApi] = useVbenVxeGrid({
       zoom: true,
     },
   } as VxeTableGridOptions<SystemAdminApi.SystemAdmin>,
-});
-
-onMounted(async () => {
-  try {
-    const roles = await getAllRoles();
-    roleOptions.value = (roles || []).map((role) => ({
-      description: role.description,
-      label: role.name,
-      value: role.name,
-    }));
-    gridApi.setGridOptions({
-      columns: useColumns(
-        onActionClick,
-        onStatusChange,
-        onRolesChange,
-        roleOptions.value,
-      ),
-    });
-  } catch {
-    // ignore
-  }
 });
 
 function onActionClick(e: OnActionClickParams<SystemAdminApi.SystemAdmin>) {
@@ -144,20 +113,6 @@ async function onStatusChange(
     await updateAdmin(row.username, {
       status: newStatus as 'disabled' | 'enabled',
     });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-async function onRolesChange(
-  newRoles: string[],
-  row: SystemAdminApi.SystemAdmin,
-) {
-  try {
-    await setAdminRoles(row.username, newRoles);
-    row.roles = newRoles.map((name) => ({ name }) as SystemAdminApi.SystemRole);
-    message.success('角色设置成功');
     return true;
   } catch {
     return false;
