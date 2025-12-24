@@ -67,14 +67,17 @@ const showDot = computed(() =>
   notifications.value.some((item) => !item.isRead),
 );
 
-const menus = computed(() => [
+const topMenus = computed(() => [
   {
     handler: () => {
-      router.push({ name: 'Profile' });
+      router.push('/profile');
     },
     icon: 'lucide:user',
     text: $t('page.auth.profile'),
   },
+]);
+
+const menus = computed(() => [
   {
     handler: () => {
       openWindow(VBEN_DOC_URL, {
@@ -162,6 +165,7 @@ watch(
         :menus
         :roles
         :text="userStore.userInfo?.realName"
+        :top-menus="topMenus"
         :description="userStore.userInfo?.desc"
         @logout="handleLogout"
         @switch-role="handleSwitchRole"

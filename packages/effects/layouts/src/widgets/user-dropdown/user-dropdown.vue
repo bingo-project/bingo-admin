@@ -43,6 +43,13 @@ interface RoleItem {
   name: string;
 }
 
+/** 菜单项类型 */
+interface MenuItem {
+  handler: AnyFunction;
+  icon?: Component | Function | string;
+  text: string;
+}
+
 interface Props {
   /**
    * 头像
@@ -61,17 +68,17 @@ interface Props {
    */
   enableShortcutKey?: boolean;
   /**
-   * 菜单数组
+   * 菜单数组（显示在角色切换下方）
    */
-  menus?: Array<{
-    handler: AnyFunction;
-    icon?: Component | Function | string;
-    text: string;
-  }>;
+  menus?: MenuItem[];
   /**
    * 用户拥有的所有角色
    */
   roles?: RoleItem[];
+  /**
+   * 顶部菜单数组（显示在角色切换上方，如个人中心）
+   */
+  topMenus?: MenuItem[];
   /**
    * 标签文本
    */
@@ -100,6 +107,7 @@ const props = withDefaults(defineProps<Props>(), {
   showShortcutKey: true,
   tagText: '',
   text: '',
+  topMenus: () => [],
   trigger: 'click',
   hoverDelay: 500,
 });
@@ -262,6 +270,18 @@ if (enableShortcutKey.value) {
             </div>
           </div>
         </DropdownMenuLabel>
+        <!-- 顶部菜单（如个人中心） -->
+        <DropdownMenuSeparator v-if="topMenus?.length" />
+        <DropdownMenuItem
+          v-for="menu in topMenus"
+          :key="menu.text"
+          class="mx-1 flex cursor-pointer items-center rounded-sm py-1 leading-8"
+          @click="menu.handler"
+        >
+          <VbenIcon :icon="menu.icon" class="mr-2 size-4" />
+          {{ menu.text }}
+        </DropdownMenuItem>
+
         <!-- 角色切换区域 -->
         <template v-if="showRoles">
           <DropdownMenuSeparator />
@@ -291,6 +311,7 @@ if (enableShortcutKey.value) {
           </DropdownMenuRadioGroup>
         </template>
 
+        <!-- 底部菜单（文档、Github等） -->
         <DropdownMenuSeparator v-if="menus?.length" />
         <DropdownMenuItem
           v-for="menu in menus"
