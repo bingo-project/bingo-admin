@@ -9,6 +9,14 @@
 ../bingo/api/swagger/admserver/swagger.json
 ```
 
+## 前端模板参考
+
+Vben Admin 模板代码位于：
+
+```
+../vue-vben-admin
+```
+
 ## 查看方式
 
 ### 方式 1: 直接查看 YAML 文件
