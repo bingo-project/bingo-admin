@@ -205,7 +205,11 @@ function onCreate() {
     <ResetPasswordModal @success="onRefresh" />
     <Grid :table-title="$t('system.admin.list')">
       <template #toolbar-tools>
-        <Button type="primary" @click="onCreate">
+        <Button
+          v-access:code="'System:Admin:Create'"
+          type="primary"
+          @click="onCreate"
+        >
           <Plus class="size-5" />
           {{ $t('ui.actionTitle.create', [$t('system.admin.name')]) }}
         </Button>

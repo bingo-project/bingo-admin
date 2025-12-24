@@ -261,18 +261,9 @@ export function useColumns<T = SystemAdminApi.SystemAdmin>(
         },
         name: 'CellOperation',
         options: [
-          {
-            code: 'edit',
-            text: $t('common.edit'),
-          },
-          {
-            code: 'resetPassword',
-            text: $t('system.admin.resetPassword'),
-          },
-          {
-            code: 'delete',
-            text: $t('common.delete'),
-          },
+          { auth: 'System:Admin:Edit', code: 'edit' },
+          { auth: 'System:Admin:ResetPassword', code: 'resetPassword', text: $t('system.admin.resetPassword') },
+          { auth: 'System:Admin:Delete', code: 'delete' },
         ],
       },
       field: 'operation',

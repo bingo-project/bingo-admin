@@ -133,6 +133,10 @@ export function useColumns<T = SystemRoleApi.SystemRole>(
           onClick: onActionClick,
         },
         name: 'CellOperation',
+        options: [
+          { auth: 'System:Role:Edit', code: 'edit' },
+          { auth: 'System:Role:Delete', code: 'delete' },
+        ],
       },
       field: 'operation',
       fixed: 'right',
