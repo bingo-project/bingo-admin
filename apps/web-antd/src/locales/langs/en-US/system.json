@@ -61,7 +61,8 @@
     "createdAt": "Created At",
     "operation": "Operation",
     "permissions": "Permissions",
-    "setPermissions": "Permissions"
+    "setPermissions": "Permissions",
+    "setMenus": "Set Menus"
   },
   "admin": {
     "title": "Admin",

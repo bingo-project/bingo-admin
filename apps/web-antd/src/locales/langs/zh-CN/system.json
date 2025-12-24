@@ -63,7 +63,8 @@
     "createdAt": "创建时间",
     "operation": "操作",
     "permissions": "权限",
-    "setPermissions": "授权"
+    "setPermissions": "授权",
+    "setMenus": "菜单授权"
   },
   "admin": {
     "title": "管理员",
