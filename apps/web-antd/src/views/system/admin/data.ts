@@ -7,6 +7,7 @@ import type { SystemAdminApi } from '#/api';
 
 import { h } from 'vue';
 
+import { z } from '#/adapter/form';
 import { getAllRoles } from '#/api';
 import { $t } from '#/locales';
 
@@ -35,10 +36,16 @@ export function useFormSchema(isEdit: boolean): VbenFormSchema[] {
       defaultValue: '',
       dependencies: {
         rules: (values) => {
+          const minLengthRule = z
+            .string()
+            .min(
+              6,
+              $t('ui.formRules.minLength', [$t('system.admin.password'), 6]),
+            );
           if (!isEdit) {
-            return 'required';
+            return minLengthRule;
           }
-          return values.password ? 'required' : null;
+          return values.password ? minLengthRule : null;
         },
         triggerFields: ['password'],
       },
@@ -50,6 +57,7 @@ export function useFormSchema(isEdit: boolean): VbenFormSchema[] {
       component: 'Input',
       fieldName: 'email',
       label: $t('system.admin.email'),
+      rules: z.string().email($t('ui.formRules.email')),
     },
     {
       component: 'Input',
@@ -75,13 +83,23 @@ export function useFormSchema(isEdit: boolean): VbenFormSchema[] {
       fieldName: 'roleNames',
       label: $t('system.admin.roles'),
       renderComponentContent: () => ({
-        option: ({ description, label }: { description: string; label: string }) => {
-          return h('div', { class: 'flex items-center justify-between w-full' }, [
-            h('span', {}, label),
-            description
-              ? h('span', { class: 'text-gray-400 text-xs' }, description)
-              : null,
-          ]);
+        option: ({
+          description,
+          label,
+        }: {
+          description: string;
+          label: string;
+        }) => {
+          return h(
+            'div',
+            { class: 'flex items-center justify-between w-full' },
+            [
+              h('span', {}, label),
+              description
+                ? h('span', { class: 'text-gray-400 text-xs' }, description)
+                : null,
+            ],
+          );
         },
       }),
     },
