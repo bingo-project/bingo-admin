@@ -20,7 +20,7 @@ import { deleteMenu, getMenuList, SystemMenuApi } from '#/api/system/menu';
 import { useColumns } from './data';
 import Form from './modules/form.vue';
 
-const isExpanded = ref(true);
+const isExpanded = ref(false);
 
 const [FormDrawer, formDrawerApi] = useVbenDrawer({
   connectedComponent: Form,
