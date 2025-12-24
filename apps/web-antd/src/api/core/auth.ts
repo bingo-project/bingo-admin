@@ -75,3 +75,37 @@ export interface SwitchRoleParams {
 export async function switchRoleApi(data: SwitchRoleParams) {
   return requestClient.put<AdminInfo>('/v1/auth/switch-role', data);
 }
+
+/** 修改密码请求参数 */
+export interface ChangePasswordParams {
+  passwordOld: string;
+  passwordNew: string;
+}
+
+/**
+ * 修改密码
+ * @param data 旧密码和新密码
+ */
+export async function changePasswordApi(data: ChangePasswordParams) {
+  return requestClient.put<void>('/v1/auth/change-password', data);
+}
+
+/** 更新个人信息请求参数 */
+export interface UpdateProfileParams {
+  nickname?: string;
+  email?: string;
+  phone?: string;
+}
+
+/**
+ * 更新个人信息
+ * @param username 当前用户名
+ * @param data 更新的字段（nickname、email、phone）
+ * @returns 更新后的用户信息
+ */
+export async function updateProfileApi(
+  username: string,
+  data: UpdateProfileParams,
+) {
+  return requestClient.put<AdminInfo>(`/v1/admins/${username}`, data);
+}

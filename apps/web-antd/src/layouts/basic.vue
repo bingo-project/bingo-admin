@@ -6,6 +6,7 @@ import type { NotificationItem } from '@vben/layouts';
 import type { RoleInfo } from '@vben/types';
 
 import { computed, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 import { AuthenticationLoginExpiredModal } from '@vben/common-ui';
 import { VBEN_DOC_URL, VBEN_GITHUB_URL } from '@vben/constants';
@@ -24,6 +25,8 @@ import { openWindow } from '@vben/utils';
 import { $t } from '#/locales';
 import { useAuthStore } from '#/store';
 import LoginForm from '#/views/_core/authentication/login.vue';
+
+const router = useRouter();
 
 const notifications = ref<NotificationItem[]>([
   {
@@ -65,6 +68,13 @@ const showDot = computed(() =>
 );
 
 const menus = computed(() => [
+  {
+    handler: () => {
+      router.push({ name: 'Profile' });
+    },
+    icon: 'lucide:user',
+    text: $t('page.auth.profile'),
+  },
   {
     handler: () => {
       openWindow(VBEN_DOC_URL, {
