@@ -27,7 +27,7 @@
   /* --vxe-ui-input-disabled-background-color: #262727; */
 
   /* loading */
-  --vxe-ui-loading-background-color: hsl(var(--overlay-content));
+  --vxe-ui-loading-background-color: hsl(0 0% 0% / 5%);
 
   /* table */
   --vxe-ui-table-header-background-color: hsl(var(--accent));
