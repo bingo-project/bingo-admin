@@ -85,6 +85,7 @@
     "resetPasswordTitle": "重置密码",
     "resetPasswordConfirm": "确定要重置 {0} 的密码吗？",
     "resetPasswordSuccess": "密码重置成功",
-    "passwordMismatch": "两次输入的密码不一致"
+    "passwordMismatch": "两次输入的密码不一致",
+    "setRoles": "角色授权"
   }
 }

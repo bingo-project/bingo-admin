@@ -83,6 +83,7 @@
     "resetPasswordTitle": "Reset Password",
     "resetPasswordConfirm": "Are you sure to reset the password of {0}?",
     "resetPasswordSuccess": "Password reset successfully",
-    "passwordMismatch": "The passwords do not match"
+    "passwordMismatch": "The passwords do not match",
+    "setRoles": "Set Roles"
   }
 }
