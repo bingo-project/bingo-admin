@@ -186,7 +186,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       return userInfo;
     } catch (error) {
-      message.error('角色切换失败，请稍后重试');
+      // 错误由请求拦截器处理
       throw error;
     }
   }
