@@ -1,4 +1,4 @@
-// ABOUTME: 认证相关 API，包括登录、登出、刷新 Token、切换角色
+// ABOUTME: 认证相关 API，包括登录、登出、刷新 Token、切换角色、TOTP 两步验证
 // ABOUTME: 切换角色 API 用于多角色用户在不同角色间切换权限视角
 
 import type { AdminInfo } from './user';
@@ -16,11 +16,43 @@ export namespace AuthApi {
   export interface LoginResult {
     accessToken: string;
     expiresAt: string;
+    /** 是否需要 TOTP 验证 */
+    requireTotp?: boolean;
+    /** 两步登录临时 Token */
+    totpToken?: string;
   }
 
   export interface RefreshTokenResult {
     data: string;
     status: number;
+  }
+
+  /** TOTP 状态响应 */
+  export interface TOTPStatusResponse {
+    enabled: boolean;
+  }
+
+  /** TOTP 设置响应 */
+  export interface TOTPSetupResponse {
+    secret: string;
+    otpauthUrl: string;
+  }
+
+  /** TOTP 登录请求参数 */
+  export interface TOTPLoginParams {
+    code: string;
+    totpToken: string;
+  }
+
+  /** 启用 TOTP 请求参数 */
+  export interface TOTPEnableParams {
+    code: string;
+  }
+
+  /** 禁用 TOTP 请求参数 */
+  export interface TOTPDisableParams {
+    totpCode: string;
+    verifyCode?: string;
   }
 }
 
@@ -65,6 +97,8 @@ export async function getAccessCodesApi(): Promise<string[]> {
 /** 切换角色请求参数 */
 export interface SwitchRoleParams {
   roleName: string;
+  /** 切换到需要 TOTP 的角色时必填 */
+  totpCode?: string;
 }
 
 /**
@@ -108,4 +142,49 @@ export async function updateProfileApi(
   data: UpdateProfileParams,
 ) {
   return requestClient.put<AdminInfo>(`/v1/admins/${username}`, data);
+}
+
+/**
+ * TOTP 二次登录验证
+ * @param data TOTP 验证码和临时 Token
+ * @returns 登录结果
+ */
+export async function totpLoginApi(data: AuthApi.TOTPLoginParams) {
+  return requestClient.post<AuthApi.LoginResult>('/v1/auth/login/totp', data);
+}
+
+/**
+ * 获取 TOTP 状态
+ * @returns TOTP 是否已启用
+ */
+export async function getTotpStatusApi() {
+  return requestClient.get<AuthApi.TOTPStatusResponse>(
+    '/v1/auth/security/totp/status',
+  );
+}
+
+/**
+ * 获取 TOTP 设置信息（生成 QR 码）
+ * @returns secret 和 otpauthUrl
+ */
+export async function getTotpSetupApi() {
+  return requestClient.post<AuthApi.TOTPSetupResponse>(
+    '/v1/auth/security/totp/setup',
+  );
+}
+
+/**
+ * 启用 TOTP
+ * @param data 6 位验证码
+ */
+export async function enableTotpApi(data: AuthApi.TOTPEnableParams) {
+  return requestClient.post<void>('/v1/auth/security/totp/enable', data);
+}
+
+/**
+ * 禁用 TOTP
+ * @param data TOTP 验证码（预留邮箱验证码）
+ */
+export async function disableTotpApi(data: AuthApi.TOTPDisableParams) {
+  return requestClient.post<void>('/v1/auth/security/totp/disable', data);
 }

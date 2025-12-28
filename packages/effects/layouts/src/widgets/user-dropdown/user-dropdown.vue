@@ -6,7 +6,7 @@ import type { Component } from 'vue';
 
 import type { AnyFunction } from '@vben/types';
 
-import { computed, useTemplateRef, watch } from 'vue';
+import { computed, ref, useTemplateRef, watch } from 'vue';
 
 import { useHoverToggle } from '@vben/hooks';
 import { LockKeyhole, LogOut } from '@vben/icons';
@@ -27,6 +27,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
+  PinInput,
+  PinInputGroup,
+  PinInputInput,
   VbenAvatar,
   VbenIcon,
 } from '@vben-core/shadcn-ui';
@@ -41,6 +44,8 @@ interface RoleItem {
   description?: string;
   /** 角色名称 */
   name: string;
+  /** 是否强制要求 TOTP */
+  requireTotp?: boolean;
 }
 
 /** 菜单项类型 */
@@ -114,8 +119,21 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   logout: [];
-  switchRole: [roleName: string];
+  switchRole: [roleName: string, totpCode?: string];
 }>();
+
+// TOTP 验证弹窗相关
+const totpCodeValue = ref<string[]>([]);
+const pendingRoleName = ref('');
+
+const [TotpModal, totpModalApi] = useVbenModal({
+  onConfirm() {
+    handleTotpConfirm();
+  },
+  onCancel() {
+    handleTotpCancel();
+  },
+});
 
 const { globalLockScreenShortcutKey, globalLogoutShortcutKey } =
   usePreferences();
@@ -192,9 +210,39 @@ function handleSubmitLogout() {
 
 function handleSwitchRole(roleName: string) {
   if (roleName !== props.currentRole && canSwitchRole.value) {
-    emit('switchRole', roleName);
-    openPopover.value = false;
+    // 检查目标角色是否需要 TOTP 验证
+    const targetRole = props.roles.find((r) => r.name === roleName);
+    if (targetRole?.requireTotp) {
+      // 需要 TOTP 验证，弹出验证框
+      pendingRoleName.value = roleName;
+      totpCodeValue.value = [];
+      totpModalApi.open();
+      openPopover.value = false;
+    } else {
+      // 不需要 TOTP，直接切换
+      emit('switchRole', roleName);
+      openPopover.value = false;
+    }
   }
+}
+
+function handleTotpComplete(code: string[]) {
+  totpCodeValue.value = code;
+}
+
+function handleTotpConfirm() {
+  const code = totpCodeValue.value.join('');
+  if (code.length === 6 && pendingRoleName.value) {
+    emit('switchRole', pendingRoleName.value, code);
+    totpModalApi.close();
+    pendingRoleName.value = '';
+    totpCodeValue.value = [];
+  }
+}
+
+function handleTotpCancel() {
+  pendingRoleName.value = '';
+  totpCodeValue.value = [];
 }
 
 if (enableShortcutKey.value) {
@@ -233,6 +281,41 @@ if (enableShortcutKey.value) {
   >
     {{ $t('ui.widgets.logoutTip') }}
   </LogoutModal>
+
+  <!-- TOTP 验证弹窗 -->
+  <TotpModal
+    :cancel-text="$t('common.cancel')"
+    :confirm-text="$t('common.confirm')"
+    :fullscreen-button="false"
+    :title="$t('ui.widgets.totpVerify', '两步验证')"
+    centered
+    content-class="px-6"
+    footer-class="border-none mb-3 mr-3"
+    header-class="border-none"
+  >
+    <div class="flex flex-col items-center gap-4 py-4">
+      <p class="text-muted-foreground text-sm">
+        {{ $t('ui.widgets.totpVerifyTip', '请输入验证器应用中的 6 位验证码') }}
+      </p>
+      <PinInput
+        v-model="totpCodeValue"
+        class="flex justify-center gap-2"
+        otp
+        placeholder="○"
+        type="number"
+        @complete="handleTotpComplete"
+      >
+        <PinInputGroup class="gap-2">
+          <PinInputInput
+            v-for="(_, index) in 6"
+            :key="index"
+            :index="index"
+            class="size-10 text-center text-lg"
+          />
+        </PinInputGroup>
+      </PinInput>
+    </div>
+  </TotpModal>
 
   <DropdownMenu v-model:open="openPopover">
     <DropdownMenuTrigger ref="refTrigger" :disabled="props.trigger === 'hover'">

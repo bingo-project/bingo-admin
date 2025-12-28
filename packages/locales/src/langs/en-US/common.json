@@ -22,5 +22,35 @@
   "showSearchPanel": "Show search panel",
   "hideSearchPanel": "Hide search panel",
   "expandAll": "Expand All",
-  "collapseAll": "Collapse All"
+  "collapseAll": "Collapse All",
+  "profile": {
+    "security": {
+      "totp": {
+        "title": "Two-Step Verification",
+        "description": "Add extra security to your account with an authenticator app",
+        "enabled": "Enabled",
+        "disabled": "Not Enabled",
+        "enableBtn": "Enable",
+        "disableBtn": "Disable",
+        "enableTitle": "Enable Two-Step Verification",
+        "disableTitle": "Disable Two-Step Verification",
+        "confirm": "Confirm Enable",
+        "confirmDisable": "Confirm Disable",
+        "step1": "1. Download an authenticator app",
+        "step1Desc": "We recommend Google Authenticator or Microsoft Authenticator",
+        "step2": "2. Scan the QR code or enter the key manually",
+        "step2Desc": "Use your authenticator app to scan the QR code below",
+        "step3": "3. Enter the verification code",
+        "step3Desc": "Enter the 6-digit code shown in your authenticator app",
+        "secretKey": "Secret Key (for manual entry)",
+        "codePlaceholder": "Enter 6-digit code",
+        "codeTip": "Please enter 6-digit code",
+        "enterCode": "Enter current verification code",
+        "disableDesc": "After disabling, you will no longer need two-step verification to log in",
+        "enableSuccess": "Two-step verification enabled",
+        "disableSuccess": "Two-step verification disabled",
+        "copied": "Secret key copied"
+      }
+    }
+  }
 }

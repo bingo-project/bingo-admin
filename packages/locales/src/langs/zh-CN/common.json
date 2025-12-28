@@ -22,5 +22,35 @@
   "showSearchPanel": "显示搜索面板",
   "hideSearchPanel": "隐藏搜索面板",
   "expandAll": "展开全部",
-  "collapseAll": "收起全部"
+  "collapseAll": "收起全部",
+  "profile": {
+    "security": {
+      "totp": {
+        "title": "两步验证",
+        "description": "使用身份验证器应用为您的账户添加额外的安全保护",
+        "enabled": "已启用",
+        "disabled": "未启用",
+        "enableBtn": "启用",
+        "disableBtn": "禁用",
+        "enableTitle": "启用两步验证",
+        "disableTitle": "禁用两步验证",
+        "confirm": "确认启用",
+        "confirmDisable": "确认禁用",
+        "step1": "1. 下载身份验证器应用",
+        "step1Desc": "推荐使用 Google Authenticator 或 Microsoft Authenticator",
+        "step2": "2. 扫描二维码或手动输入密钥",
+        "step2Desc": "使用身份验证器应用扫描下方二维码",
+        "step3": "3. 输入验证码确认",
+        "step3Desc": "输入身份验证器应用中显示的 6 位验证码",
+        "secretKey": "密钥（无法扫码时手动输入）",
+        "codePlaceholder": "请输入 6 位验证码",
+        "codeTip": "请输入 6 位验证码",
+        "enterCode": "请输入当前验证码",
+        "disableDesc": "禁用后，登录时将不再需要两步验证",
+        "enableSuccess": "两步验证已启用",
+        "disableSuccess": "两步验证已禁用",
+        "copied": "密钥已复制"
+      }
+    }
+  }
 }

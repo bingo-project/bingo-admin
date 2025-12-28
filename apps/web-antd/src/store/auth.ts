@@ -1,4 +1,4 @@
-// ABOUTME: 认证状态管理，处理登录、登出、获取用户信息
+// ABOUTME: 认证状态管理，处理登录、登出、获取用户信息、TOTP 两步验证
 // ABOUTME: 包含角色切换功能，切换后刷新用户权限和菜单
 
 import type { Recordable, UserInfo } from '@vben/types';
@@ -19,8 +19,11 @@ import {
   loginApi,
   logoutApi,
   switchRoleApi,
+  totpLoginApi,
 } from '#/api';
 import { $t } from '#/locales';
+
+const TOTP_TOKEN_KEY = 'totp_token';
 
 export const useAuthStore = defineStore('auth', () => {
   const accessStore = useAccessStore();
@@ -33,57 +36,103 @@ export const useAuthStore = defineStore('auth', () => {
    * 异步处理登录操作
    * Asynchronously handle the login process
    * @param params 登录表单数据
+   * @returns 包含 userInfo 和 requireTotp 的对象
    */
   async function authLogin(
     params: Recordable<any>,
     onSuccess?: () => Promise<void> | void,
   ) {
-    // 异步处理用户登录操作并获取 accessToken
     let userInfo: null | UserInfo = null;
     try {
       loginLoading.value = true;
-      const { accessToken } = await loginApi(params);
+      const loginResult = await loginApi(params);
 
-      // 如果成功获取到 accessToken
-      if (accessToken) {
-        accessStore.setAccessToken(accessToken);
+      // 检查是否需要 TOTP 验证
+      if (loginResult.requireTotp && loginResult.totpToken) {
+        // 保存 totpToken 到 sessionStorage
+        sessionStorage.setItem(TOTP_TOKEN_KEY, loginResult.totpToken);
+        // 跳转到 TOTP 验证页面
+        await router.push('/auth/totp-login');
+        return { userInfo: null, requireTotp: true };
+      }
 
-        // 获取用户信息并存储到 accessStore 中
-        const [fetchUserInfoResult, accessCodes] = await Promise.all([
-          fetchUserInfo(),
-          getAccessCodesApi(),
-        ]);
-
-        userInfo = fetchUserInfoResult;
-
-        userStore.setUserInfo(userInfo);
-        accessStore.setAccessCodes(accessCodes);
-
-        if (accessStore.loginExpired) {
-          accessStore.setLoginExpired(false);
-        } else {
-          onSuccess
-            ? await onSuccess?.()
-            : await router.push(
-                userInfo.homePath || preferences.app.defaultHomePath,
-              );
-        }
-
-        if (userInfo?.realName) {
-          notification.success({
-            description: `${$t('authentication.loginSuccessDesc')}:${userInfo?.realName}`,
-            duration: 3,
-            message: $t('authentication.loginSuccess'),
-          });
-        }
+      // 正常登录流程
+      if (loginResult.accessToken) {
+        userInfo = await handleLoginSuccess(loginResult.accessToken, onSuccess);
       }
     } finally {
       loginLoading.value = false;
     }
 
-    return {
-      userInfo,
-    };
+    return { userInfo, requireTotp: false };
+  }
+
+  /**
+   * TOTP 二次验证登录
+   * @param code 6 位验证码
+   */
+  async function totpLogin(code: string) {
+    const totpToken = sessionStorage.getItem(TOTP_TOKEN_KEY);
+    if (!totpToken) {
+      message.error($t('authentication.totpTokenExpired'));
+      await router.push(LOGIN_PATH);
+      return null;
+    }
+
+    try {
+      loginLoading.value = true;
+      const loginResult = await totpLoginApi({ code, totpToken });
+
+      if (loginResult.accessToken) {
+        // 清除 totpToken
+        sessionStorage.removeItem(TOTP_TOKEN_KEY);
+        return await handleLoginSuccess(loginResult.accessToken);
+      }
+      return null;
+    } finally {
+      loginLoading.value = false;
+    }
+  }
+
+  /**
+   * 处理登录成功后的通用逻辑
+   */
+  async function handleLoginSuccess(
+    accessToken: string,
+    onSuccess?: () => Promise<void> | void,
+  ) {
+    accessStore.setAccessToken(accessToken);
+
+    // 获取用户信息并存储到 accessStore 中
+    const [fetchUserInfoResult, accessCodes] = await Promise.all([
+      fetchUserInfo(),
+      getAccessCodesApi(),
+    ]);
+
+    const userInfo = fetchUserInfoResult;
+
+    userStore.setUserInfo(userInfo);
+    accessStore.setAccessCodes(accessCodes);
+
+    if (accessStore.loginExpired) {
+      accessStore.setLoginExpired(false);
+    } else {
+      onSuccess
+        ? await onSuccess?.()
+        : await router.push(
+            userInfo.homePath || preferences.app.defaultHomePath,
+          );
+    }
+
+    if (userInfo?.realName) {
+      notification.success({
+        description: `${$t('authentication.loginSuccessDesc')}:${userInfo?.realName}`,
+        duration: 3,
+        message: $t('authentication.loginSuccess'),
+      });
+    }
+
+    return userInfo;
   }
 
   async function logout(redirect: boolean = true) {
@@ -116,11 +165,12 @@ export const useAuthStore = defineStore('auth', () => {
   /**
    * 切换用户角色
    * @param roleName 目标角色名
+   * @param totpCode TOTP 验证码（切换到需要 TOTP 的角色时必填）
    */
-  async function switchRole(roleName: string) {
+  async function switchRole(roleName: string, totpCode?: string) {
     try {
       // 1. 调用后端切换角色接口
-      await switchRoleApi({ roleName });
+      await switchRoleApi({ roleName, totpCode });
 
       // 2. 重新获取用户信息
       const userInfo = await fetchUserInfo();
@@ -152,5 +202,6 @@ export const useAuthStore = defineStore('auth', () => {
     loginLoading,
     logout,
     switchRole,
+    totpLogin,
   };
 });

@@ -33,6 +33,16 @@ export function useFormSchema(): VbenFormSchema[] {
       label: $t('system.role.status'),
     },
     {
+      component: 'Switch',
+      componentProps: {
+        checkedChildren: $t('common.yes'),
+        unCheckedChildren: $t('common.no'),
+      },
+      defaultValue: false,
+      fieldName: 'requireTotp',
+      label: $t('system.role.requireTotp'),
+    },
+    {
       component: 'Textarea',
       fieldName: 'remark',
       label: $t('system.role.remark'),
@@ -112,6 +122,18 @@ export function useColumns<T = SystemRoleApi.SystemRole>(
       field: 'status',
       title: $t('system.role.status'),
       width: 100,
+    },
+    {
+      cellRender: {
+        name: 'CellTag',
+        options: [
+          { color: 'success', label: $t('common.yes'), value: true },
+          { color: 'default', label: $t('common.no'), value: false },
+        ],
+      },
+      field: 'requireTotp',
+      title: $t('system.role.requireTotp'),
+      width: 120,
     },
     {
       field: 'remark',

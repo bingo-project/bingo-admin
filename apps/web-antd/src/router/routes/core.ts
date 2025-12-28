@@ -90,6 +90,14 @@ const coreRoutes: RouteRecordRaw[] = [
           title: $t('page.auth.register'),
         },
       },
+      {
+        name: 'TotpLogin',
+        path: 'totp-login',
+        component: () => import('#/views/_core/authentication/totp-login.vue'),
+        meta: {
+          title: $t('page.auth.totpLogin'),
+        },
+      },
     ],
   },
 ];

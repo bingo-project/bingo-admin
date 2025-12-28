@@ -7,7 +7,8 @@
     "forgetPassword": "Forget Password",
     "sendingCode": "SMS Code is sending...",
     "codeSentTo": "Code has been sent to {0}",
-    "profile": "Profile"
+    "profile": "Profile",
+    "totpLogin": "Two-Step Verification"
   },
   "dashboard": {
     "title": "Dashboard",

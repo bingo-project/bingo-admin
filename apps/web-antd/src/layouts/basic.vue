@@ -120,6 +120,7 @@ const roles = computed(() => {
     userStore.userInfo?.rolesInfo?.map((r: RoleInfo) => ({
       description: r.description,
       name: r.name,
+      requireTotp: r.requireTotp,
     })) || []
   );
 });
@@ -128,8 +129,8 @@ async function handleLogout() {
   await authStore.logout(false);
 }
 
-async function handleSwitchRole(roleName: string) {
-  await authStore.switchRole(roleName);
+async function handleSwitchRole(roleName: string, totpCode?: string) {
+  await authStore.switchRole(roleName, totpCode);
 }
 
 function handleNoticeClear() {

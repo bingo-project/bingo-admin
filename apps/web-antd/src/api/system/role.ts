@@ -11,6 +11,8 @@ export namespace SystemRoleApi {
     permissions: string[];
     remark?: string;
     status: 'enabled' | 'disabled';
+    /** 是否强制要求 TOTP */
+    requireTotp?: boolean;
   }
 }
 

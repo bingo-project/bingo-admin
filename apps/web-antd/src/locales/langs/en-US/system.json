@@ -57,6 +57,7 @@
     "id": "Role ID",
     "description": "Description",
     "status": "Status",
+    "requireTotp": "Require 2FA",
     "remark": "Remark",
     "createdAt": "Created At",
     "operation": "Operation",

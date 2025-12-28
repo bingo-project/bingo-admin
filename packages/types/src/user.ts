@@ -11,6 +11,8 @@ export interface RoleInfo {
   id: number;
   /** 角色名称 */
   name: string;
+  /** 是否强制要求 TOTP */
+  requireTotp?: boolean;
   /** 角色状态 */
   status?: string;
 }

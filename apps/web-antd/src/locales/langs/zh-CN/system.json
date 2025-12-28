@@ -59,6 +59,7 @@
     "id": "角色ID",
     "description": "描述",
     "status": "状态",
+    "requireTotp": "强制两步验证",
     "remark": "备注",
     "createdAt": "创建时间",
     "operation": "操作",

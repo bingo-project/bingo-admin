@@ -105,6 +105,9 @@
       "errorPasswordTip": "Password error, please re-enter",
       "backToLogin": "Back to login",
       "entry": "Enter the system"
-    }
+    },
+    "switchRole": "Switch Role",
+    "totpVerify": "Two-Step Verification",
+    "totpVerifyTip": "Enter the 6-digit code from your authenticator app"
   }
 }
