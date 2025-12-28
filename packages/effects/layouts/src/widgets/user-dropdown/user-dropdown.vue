@@ -96,6 +96,8 @@ interface Props {
   trigger?: 'both' | 'click' | 'hover';
   /** hover触发时，延迟响应的时间 */
   hoverDelay?: number;
+  /** 用户是否已启用 TOTP */
+  totpEnabled?: boolean;
 }
 
 defineOptions({
@@ -115,11 +117,13 @@ const props = withDefaults(defineProps<Props>(), {
   topMenus: () => [],
   trigger: 'click',
   hoverDelay: 500,
+  totpEnabled: false,
 });
 
 const emit = defineEmits<{
   logout: [];
   switchRole: [roleName: string, totpCode?: string];
+  navigateToTotpSetup: [];
 }>();
 
 // TOTP 验证弹窗相关
@@ -213,7 +217,14 @@ function handleSwitchRole(roleName: string) {
     // 检查目标角色是否需要 TOTP 验证
     const targetRole = props.roles.find((r) => r.name === roleName);
     if (targetRole?.requireTotp) {
-      // 需要 TOTP 验证，弹出验证框
+      // 目标角色需要 TOTP，检查用户是否已启用
+      if (!props.totpEnabled) {
+        // 用户未启用 TOTP，引导去启用
+        emit('navigateToTotpSetup');
+        openPopover.value = false;
+        return;
+      }
+      // 用户已启用 TOTP，弹出验证框
       pendingRoleName.value = roleName;
       totpCodeValue.value = [];
       totpModalApi.open();

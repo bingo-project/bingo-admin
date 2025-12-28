@@ -47,6 +47,10 @@ interface UserInfo extends BasicUserInfo {
    * accessToken
    */
   token: string;
+  /**
+   * 是否已启用 TOTP 两步验证
+   */
+  totpEnabled?: boolean;
 }
 
 export type { UserInfo };

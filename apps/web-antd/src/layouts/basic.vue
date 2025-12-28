@@ -125,12 +125,20 @@ const roles = computed(() => {
   );
 });
 
+const totpEnabled = computed(() => {
+  return userStore.userInfo?.totpEnabled ?? false;
+});
+
 async function handleLogout() {
   await authStore.logout(false);
 }
 
 async function handleSwitchRole(roleName: string, totpCode?: string) {
   await authStore.switchRole(roleName, totpCode);
+}
+
+function handleNavigateToTotpSetup() {
+  router.push('/profile/security');
 }
 
 function handleNoticeClear() {
@@ -168,8 +176,10 @@ watch(
         :text="userStore.userInfo?.realName"
         :top-menus="topMenus"
         :description="userStore.userInfo?.desc"
+        :totp-enabled="totpEnabled"
         @logout="handleLogout"
         @switch-role="handleSwitchRole"
+        @navigate-to-totp-setup="handleNavigateToTotpSetup"
       />
     </template>
     <template #notification>
