@@ -241,6 +241,7 @@ function handleTotpConfirm() {
 }
 
 function handleTotpCancel() {
+  totpModalApi.close();
   pendingRoleName.value = '';
   totpCodeValue.value = [];
 }
