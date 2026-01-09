@@ -79,34 +79,6 @@ bingo-admin/
 
 ---
 
-## 初始化清理（已完成）
-
-**已删除**（演示代码，需要时从源仓库 v5.5.9 tag 复制）：
-
-- `apps/web-ele/` - Element Plus 版示例
-- `apps/web-naive/` - Naive UI 版示例
-- `apps/web-antd/src/views/demos/` - 组件演示页面
-- `playground/` - 完整演示应用
-- `docs/` - Vben 文档站
-
-**保留**：
-
-- `apps/web-antd/` - 主应用
-- `apps/web-antd/src/views/_core/` - 核心页面（登录、404 等）
-- `apps/backend-mock/` - Mock 服务（开发阶段）
-- `packages/` - 框架核心
-- `internal/` - 构建配置
-- `scripts/` - 构建脚本
-
-**从 playground 迁移到 web-antd**（系统管理功能）：
-
-- `views/system/menu/` - 菜单管理
-- `views/system/role/` - 角色管理
-- `views/system/dept/` - 部门管理
-- `api/system/` - 系统管理 API
-
----
-
 ## 上游同步策略
 
 1. **基于 v5.5.9 tag** 作为起点
