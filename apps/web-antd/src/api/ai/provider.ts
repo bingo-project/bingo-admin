@@ -45,15 +45,14 @@ async function getProvider(id: string) {
  * @param id Provider ID
  * @param data 更新数据
  */
-async function updateProvider(id: string, data: AiProviderApi.UpdateProviderRequest) {
+async function updateProvider(
+  id: string,
+  data: AiProviderApi.UpdateProviderRequest,
+) {
   return requestClient.put<AiProviderApi.AiProvider>(
     `/v1/ai/providers/${id}`,
     data,
   );
 }
 
-export {
-  getProvider,
-  getProviderList,
-  updateProvider,
-};
+export { getProvider, getProviderList, updateProvider };

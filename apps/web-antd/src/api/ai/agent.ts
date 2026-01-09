@@ -14,7 +14,7 @@ export namespace AiAgentApi {
     description?: string;
     avatar?: string;
     prompt: string;
-    category: 'tech' | 'general' | 'creative' | 'career';
+    category: 'career' | 'creative' | 'general' | 'tech';
     modelName?: string;
     temperature?: number;
     maxTokens?: number;
@@ -30,7 +30,7 @@ export namespace AiAgentApi {
     description?: string;
     avatar?: string;
     prompt: string;
-    category: 'tech' | 'general' | 'creative' | 'career';
+    category: 'career' | 'creative' | 'general' | 'tech';
     modelName?: string;
     temperature?: number;
     maxTokens?: number;
@@ -42,7 +42,7 @@ export namespace AiAgentApi {
     description?: string;
     avatar?: string;
     prompt?: string;
-    category?: 'tech' | 'general' | 'creative' | 'career';
+    category?: 'career' | 'creative' | 'general' | 'tech';
     modelName?: string;
     temperature?: number;
     maxTokens?: number;
@@ -79,10 +79,7 @@ async function createAgent(data: AiAgentApi.CreateAgentRequest) {
  * @param data 更新数据
  */
 async function updateAgent(id: string, data: AiAgentApi.UpdateAgentRequest) {
-  return requestClient.put<AiAgentApi.AiAgent>(
-    `/v1/ai/agents/${id}`,
-    data,
-  );
+  return requestClient.put<AiAgentApi.AiAgent>(`/v1/ai/agents/${id}`, data);
 }
 
 /**
@@ -93,10 +90,4 @@ async function deleteAgent(id: string) {
   return requestClient.delete(`/v1/ai/agents/${id}`);
 }
 
-export {
-  createAgent,
-  deleteAgent,
-  getAgent,
-  getAgentList,
-  updateAgent,
-};
+export { createAgent, deleteAgent, getAgent, getAgentList, updateAgent };

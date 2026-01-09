@@ -47,10 +47,7 @@ async function getQuota(uid: number) {
  * @param data 更新数据
  */
 async function updateQuota(uid: number, data: AiQuotaApi.UpdateQuotaRequest) {
-  return requestClient.put<AiQuotaApi.AiQuota>(
-    `/v1/ai/quotas/${uid}`,
-    data,
-  );
+  return requestClient.put<AiQuotaApi.AiQuota>(`/v1/ai/quotas/${uid}`, data);
 }
 
 /**
@@ -61,9 +58,4 @@ async function resetDailyQuota(uid: number) {
   return requestClient.post(`/v1/ai/quotas/${uid}/reset-daily`);
 }
 
-export {
-  getQuota,
-  getQuotaList,
-  resetDailyQuota,
-  updateQuota,
-};
+export { getQuota, getQuotaList, resetDailyQuota, updateQuota };

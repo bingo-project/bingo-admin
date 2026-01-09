@@ -93,9 +93,21 @@ export function useColumns<T = AiProviderApi.AiProvider>(
       cellRender: {
         name: 'CellTag',
         options: [
-          { color: 'success', label: $t('ai.provider.healthStatus.healthy'), value: 'healthy' },
-          { color: 'error', label: $t('ai.provider.healthStatus.unhealthy'), value: 'unhealthy' },
-          { color: 'default', label: $t('ai.provider.healthStatus.unknown'), value: 'unknown' },
+          {
+            color: 'success',
+            label: $t('ai.provider.healthStatus.healthy'),
+            value: 'healthy',
+          },
+          {
+            color: 'error',
+            label: $t('ai.provider.healthStatus.unhealthy'),
+            value: 'unhealthy',
+          },
+          {
+            color: 'default',
+            label: $t('ai.provider.healthStatus.unknown'),
+            value: 'unknown',
+          },
         ],
       },
       field: 'healthStatus',
@@ -136,9 +148,7 @@ export function useColumns<T = AiProviderApi.AiProvider>(
           onClick: onActionClick,
         },
         name: 'CellOperation',
-        options: [
-          { auth: 'AI:Provider:Edit', code: 'edit' },
-        ],
+        options: [{ auth: 'AI:Provider:Edit', code: 'edit' }],
       },
       field: 'operation',
       fixed: 'right',

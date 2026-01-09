@@ -137,7 +137,11 @@ export function useColumns<T = AiQuotaApi.AiQuota>(
         name: 'CellOperation',
         options: [
           { auth: 'AI:Quota:Edit', code: 'edit' },
-          { auth: 'AI:Quota:ResetDaily', code: 'resetDaily', text: $t('ai.quota.resetDaily') },
+          {
+            auth: 'AI:Quota:ResetDaily',
+            code: 'resetDaily',
+            text: $t('ai.quota.resetDaily'),
+          },
         ],
       },
       field: 'operation',

@@ -10,7 +10,7 @@ import type { AiModelApi } from '#/api';
 
 import { Page, useVbenDrawer } from '@vben/common-ui';
 
-import { message, Modal } from 'ant-design-vue';
+import { Modal } from 'ant-design-vue';
 
 import { toApiPagination, useVbenVxeGrid } from '#/adapter/vxe-table';
 import { getModelList, updateModel } from '#/api';
@@ -80,10 +80,7 @@ function confirm(content: string, title: string) {
   });
 }
 
-async function onStatusChange(
-  newStatus: string,
-  row: AiModelApi.AiModel,
-) {
+async function onStatusChange(newStatus: string, row: AiModelApi.AiModel) {
   const status: Record<string, string> = {
     disabled: $t('common.disabled'),
     enabled: $t('common.enabled'),

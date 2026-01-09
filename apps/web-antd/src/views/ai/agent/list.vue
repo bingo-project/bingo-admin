@@ -85,10 +85,7 @@ function confirm(content: string, title: string) {
   });
 }
 
-async function onStatusChange(
-  newStatus: string,
-  row: AiAgentApi.AiAgent,
-) {
+async function onStatusChange(newStatus: string, row: AiAgentApi.AiAgent) {
   const status: Record<string, string> = {
     disabled: $t('common.disabled'),
     enabled: $t('common.enabled'),

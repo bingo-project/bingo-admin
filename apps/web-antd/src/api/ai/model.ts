@@ -54,14 +54,7 @@ async function getModel(id: string) {
  * @param data 更新数据
  */
 async function updateModel(id: string, data: AiModelApi.UpdateModelRequest) {
-  return requestClient.put<AiModelApi.AiModel>(
-    `/v1/ai/models/${id}`,
-    data,
-  );
+  return requestClient.put<AiModelApi.AiModel>(`/v1/ai/models/${id}`, data);
 }
 
-export {
-  getModel,
-  getModelList,
-  updateModel,
-};
+export { getModel, getModelList, updateModel };

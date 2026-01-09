@@ -5,8 +5,6 @@ import type { VbenFormSchema } from '#/adapter/form';
 import type { OnActionClickFn, VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { AiAgentApi } from '#/api';
 
-import { h } from 'vue';
-
 import { z } from '#/adapter/form';
 import { $t } from '#/locales';
 
@@ -174,9 +172,21 @@ export function useColumns<T = AiAgentApi.AiAgent>(
         name: 'CellTag',
         options: [
           { color: 'cyan', label: $t('ai.agent.category.tech'), value: 'tech' },
-          { color: 'blue', label: $t('ai.agent.category.general'), value: 'general' },
-          { color: 'purple', label: $t('ai.agent.category.creative'), value: 'creative' },
-          { color: 'orange', label: $t('ai.agent.category.career'), value: 'career' },
+          {
+            color: 'blue',
+            label: $t('ai.agent.category.general'),
+            value: 'general',
+          },
+          {
+            color: 'purple',
+            label: $t('ai.agent.category.creative'),
+            value: 'creative',
+          },
+          {
+            color: 'orange',
+            label: $t('ai.agent.category.career'),
+            value: 'career',
+          },
         ],
       },
       field: 'category',
