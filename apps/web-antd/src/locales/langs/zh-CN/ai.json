@@ -1,0 +1,79 @@
+{
+  "title": "AI 管理",
+  "provider": {
+    "title": "AI 服务商",
+    "list": "AI 服务商列表",
+    "name": "服务商",
+    "slug": "标识",
+    "baseUrl": "API 地址",
+    "status": "状态",
+    "healthStatus": {
+      "title": "健康状态",
+      "healthy": "正常",
+      "unhealthy": "异常",
+      "unknown": "未知"
+    },
+    "lastCheckAt": "最后检查时间",
+    "operation": "操作"
+  },
+  "model": {
+    "title": "AI 模型",
+    "list": "AI 模型列表",
+    "name": "模型名称",
+    "slug": "标识",
+    "displayName": "显示名称",
+    "providerName": "服务商",
+    "category": "分类",
+    "contextLength": "上下文长度",
+    "maxTokens": "最大令牌数",
+    "inputPrice": "输入价格",
+    "outputPrice": "输出价格",
+    "status": "状态",
+    "operation": "操作"
+  },
+  "quota": {
+    "title": "配额管理",
+    "list": "用户配额列表",
+    "name": "配额",
+    "uid": "用户ID",
+    "username": "用户名",
+    "nickname": "昵称",
+    "dailyLimit": "日限额",
+    "dailyUsed": "已用日配额",
+    "dailyQuota": "日配额",
+    "totalLimit": "总限额",
+    "totalUsed": "已用总配额",
+    "totalQuota": "总配额",
+    "resetAt": "重置时间",
+    "operation": "操作",
+    "editQuota": "编辑配额",
+    "resetDaily": "重置日配额",
+    "resettingDaily": "正在重置 {0} 的日配额...",
+    "confirmResetDaily": "确定要重置 {0} 的日配额吗？",
+    "resetSuccess": "{0} 的日配额重置成功"
+  },
+  "agent": {
+    "title": "AI 智能体",
+    "list": "AI 智能体列表",
+    "name": "智能体",
+    "slug": "标识",
+    "slugFormat": "只能包含小写字母、数字和下划线",
+    "description": "描述",
+    "avatar": "头像",
+    "prompt": "提示词",
+    "category": {
+      "title": "分类",
+      "tech": "技术开发",
+      "general": "通用",
+      "creative": "创意",
+      "career": "职场"
+    },
+    "modelName": "默认模型",
+    "temperature": "温度",
+    "maxTokens": "最大令牌数",
+    "status": "状态",
+    "isSystem": "系统预设",
+    "createdAt": "创建时间",
+    "operation": "操作"
+  }
+}

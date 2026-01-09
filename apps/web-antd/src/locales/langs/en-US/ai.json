@@ -1,0 +1,79 @@
+{
+  "title": "AI Management",
+  "provider": {
+    "title": "AI Providers",
+    "list": "AI Provider List",
+    "name": "Provider",
+    "slug": "Slug",
+    "baseUrl": "API Base URL",
+    "status": "Status",
+    "healthStatus": {
+      "title": "Health Status",
+      "healthy": "Healthy",
+      "unhealthy": "Unhealthy",
+      "unknown": "Unknown"
+    },
+    "lastCheckAt": "Last Check",
+    "operation": "Operation"
+  },
+  "model": {
+    "title": "AI Models",
+    "list": "AI Model List",
+    "name": "Model Name",
+    "slug": "Slug",
+    "displayName": "Display Name",
+    "providerName": "Provider",
+    "category": "Category",
+    "contextLength": "Context Length",
+    "maxTokens": "Max Tokens",
+    "inputPrice": "Input Price",
+    "outputPrice": "Output Price",
+    "status": "Status",
+    "operation": "Operation"
+  },
+  "quota": {
+    "title": "Quota Management",
+    "list": "User Quota List",
+    "name": "Quota",
+    "uid": "User ID",
+    "username": "Username",
+    "nickname": "Nickname",
+    "dailyLimit": "Daily Limit",
+    "dailyUsed": "Daily Used",
+    "dailyQuota": "Daily Quota",
+    "totalLimit": "Total Limit",
+    "totalUsed": "Total Used",
+    "totalQuota": "Total Quota",
+    "resetAt": "Reset At",
+    "operation": "Operation",
+    "editQuota": "Edit Quota",
+    "resetDaily": "Reset Daily",
+    "resettingDaily": "Resetting daily quota for {0}...",
+    "confirmResetDaily": "Are you sure to reset daily quota for {0}?",
+    "resetSuccess": "Daily quota reset successfully for {0}"
+  },
+  "agent": {
+    "title": "AI Agents",
+    "list": "AI Agent List",
+    "name": "Agent",
+    "slug": "Slug",
+    "slugFormat": "Only lowercase letters, numbers and underscores",
+    "description": "Description",
+    "avatar": "Avatar",
+    "prompt": "Prompt",
+    "category": {
+      "title": "Category",
+      "tech": "Tech",
+      "general": "General",
+      "creative": "Creative",
+      "career": "Career"
+    },
+    "modelName": "Default Model",
+    "temperature": "Temperature",
+    "maxTokens": "Max Tokens",
+    "status": "Status",
+    "isSystem": "System",
+    "createdAt": "Created At",
+    "operation": "Operation"
+  }
+}
