@@ -8,20 +8,21 @@ import { requestClient } from '#/api/request';
 export namespace AiProviderApi {
   export interface AiProvider {
     [key: string]: any;
-    id: string;
+    id: number;
     name: string;
-    slug: string;
-    baseUrl?: string;
-    status: 'disabled' | 'enabled';
-    healthStatus?: 'healthy' | 'unhealthy' | 'unknown';
-    lastCheckAt?: string;
+    displayName: string;
+    status: 'active' | 'disabled';
+    isDefault: boolean;
+    sort: number;
     createdAt: string;
     updatedAt: string;
   }
 
   export interface UpdateProviderRequest {
-    baseUrl?: string;
-    status?: 'disabled' | 'enabled';
+    displayName?: string;
+    status?: 'active' | 'disabled';
+    isDefault?: boolean;
+    sort?: number;
   }
 }
 
@@ -36,7 +37,7 @@ async function getProviderList(params?: Recordable<any>) {
  * 获取 AI Provider 详情
  * @param id Provider ID
  */
-async function getProvider(id: string) {
+async function getProvider(id: number) {
   return requestClient.get<AiProviderApi.AiProvider>(`/v1/ai/providers/${id}`);
 }
 
@@ -46,7 +47,7 @@ async function getProvider(id: string) {
  * @param data 更新数据
  */
 async function updateProvider(
-  id: string,
+  id: number,
   data: AiProviderApi.UpdateProviderRequest,
 ) {
   return requestClient.put<AiProviderApi.AiProvider>(

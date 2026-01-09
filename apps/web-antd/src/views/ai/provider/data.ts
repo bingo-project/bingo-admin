@@ -19,30 +19,32 @@ export function useFormSchema(): VbenFormSchema[] {
     },
     {
       component: 'Input',
-      componentProps: {
-        disabled: true,
-      },
-      fieldName: 'slug',
-      label: $t('ai.provider.slug'),
+      fieldName: 'displayName',
+      label: $t('ai.provider.displayName'),
+      rules: 'required',
     },
     {
-      component: 'Input',
-      fieldName: 'baseUrl',
-      label: $t('ai.provider.baseUrl'),
-      rules: 'required',
+      component: 'InputNumber',
+      fieldName: 'sort',
+      label: $t('ai.provider.sort'),
     },
     {
       component: 'RadioGroup',
       componentProps: {
         buttonStyle: 'solid',
         options: [
-          { label: $t('common.enabled'), value: 'enabled' },
+          { label: $t('common.enabled'), value: 'active' },
           { label: $t('common.disabled'), value: 'disabled' },
         ],
         optionType: 'button',
       },
       fieldName: 'status',
       label: $t('ai.provider.status'),
+    },
+    {
+      component: 'Switch',
+      fieldName: 'isDefault',
+      label: $t('ai.provider.isDefault'),
     },
   ];
 }
@@ -59,7 +61,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
       componentProps: {
         allowClear: true,
         options: [
-          { label: $t('common.enabled'), value: 'enabled' },
+          { label: $t('common.enabled'), value: 'active' },
           { label: $t('common.disabled'), value: 'disabled' },
         ],
       },
@@ -75,56 +77,51 @@ export function useColumns<T = AiProviderApi.AiProvider>(
 ): VxeTableGridOptions['columns'] {
   return [
     {
+      field: 'displayName',
+      minWidth: 180,
+      title: $t('ai.provider.displayName'),
+    },
+    {
       field: 'name',
+      width: 180,
       title: $t('ai.provider.name'),
-      width: 150,
     },
     {
-      field: 'slug',
-      title: $t('ai.provider.slug'),
-      width: 150,
-    },
-    {
-      field: 'baseUrl',
-      title: $t('ai.provider.baseUrl'),
-      minWidth: 250,
+      field: 'sort',
+      width: 100,
+      title: $t('ai.provider.sort'),
     },
     {
       cellRender: {
         name: 'CellTag',
         options: [
           {
-            color: 'success',
-            label: $t('ai.provider.healthStatus.healthy'),
-            value: 'healthy',
-          },
-          {
-            color: 'error',
-            label: $t('ai.provider.healthStatus.unhealthy'),
-            value: 'unhealthy',
+            color: 'processing',
+            label: $t('common.yes'),
+            value: true,
           },
           {
             color: 'default',
-            label: $t('ai.provider.healthStatus.unknown'),
-            value: 'unknown',
+            label: $t('common.no'),
+            value: false,
           },
         ],
       },
-      field: 'healthStatus',
-      title: $t('ai.provider.healthStatus.title'),
-      width: 120,
+      field: 'isDefault',
+      title: $t('ai.provider.isDefault'),
+      width: 100,
     },
     {
       cellRender: {
         attrs: { beforeChange: onStatusChange },
         name: onStatusChange ? 'CellSwitch' : 'CellTag',
         options: [
-          { color: 'success', label: $t('common.enabled'), value: 'enabled' },
+          { color: 'success', label: $t('common.enabled'), value: 'active' },
           { color: 'error', label: $t('common.disabled'), value: 'disabled' },
         ],
         props: {
           checkedChildren: $t('common.enabled'),
-          checkedValue: 'enabled',
+          checkedValue: 'active',
           unCheckedChildren: $t('common.disabled'),
           unCheckedValue: 'disabled',
         },
@@ -134,17 +131,11 @@ export function useColumns<T = AiProviderApi.AiProvider>(
       width: 100,
     },
     {
-      field: 'lastCheckAt',
-      formatter: 'formatDateTime',
-      title: $t('ai.provider.lastCheckAt'),
-      width: 180,
-    },
-    {
       align: 'center',
       cellRender: {
         attrs: {
-          nameField: 'name',
-          nameTitle: $t('ai.provider.name'),
+          nameField: 'displayName',
+          nameTitle: $t('ai.provider.displayName'),
           onClick: onActionClick,
         },
         name: 'CellOperation',

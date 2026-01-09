@@ -9,8 +9,9 @@ import type {
 import type { AiProviderApi } from '#/api';
 
 import { Page, useVbenDrawer } from '@vben/common-ui';
+import { Plus } from '@vben/icons';
 
-import { Modal } from 'ant-design-vue';
+import { Button, Modal } from 'ant-design-vue';
 
 import { toApiPagination, useVbenVxeGrid } from '#/adapter/vxe-table';
 import { getProviderList, updateProvider } from '#/api';
@@ -85,16 +86,16 @@ async function onStatusChange(
   row: AiProviderApi.AiProvider,
 ) {
   const status: Record<string, string> = {
+    active: $t('common.enabled'),
     disabled: $t('common.disabled'),
-    enabled: $t('common.enabled'),
   };
   try {
     await confirm(
-      `${$t('ui.actionMessage.confirmStatusChange', [row.name, status[newStatus]])}`,
+      `${$t('ui.actionMessage.confirmStatusChange', [row.displayName, status[newStatus]])}`,
       $t('ui.actionTitle.statusChange'),
     );
     await updateProvider(row.id, {
-      status: newStatus as 'disabled' | 'enabled',
+      status: newStatus as 'active' | 'disabled',
     });
     return true;
   } catch {
@@ -106,6 +107,10 @@ function onEdit(row: AiProviderApi.AiProvider) {
   formDrawerApi.setData(row).open();
 }
 
+function onCreate() {
+  formDrawerApi.setData({}).open();
+}
+
 function onRefresh() {
   gridApi.query();
 }
@@ -113,6 +118,17 @@ function onRefresh() {
 <template>
   <Page auto-content-height>
     <FormDrawer @success="onRefresh" />
-    <Grid :table-title="$t('ai.provider.list')" />
+    <Grid :table-title="$t('ai.provider.list')">
+      <template #toolbar-tools>
+        <Button
+          v-access:code="'AI:Provider:Edit'"
+          type="primary"
+          @click="onCreate"
+        >
+          <Plus class="size-5" />
+          {{ $t('common.create') }}
+        </Button>
+      </template>
+    </Grid>
   </Page>
 </template>

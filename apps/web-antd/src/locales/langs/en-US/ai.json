@@ -3,17 +3,11 @@
   "provider": {
     "title": "AI Providers",
     "list": "AI Provider List",
-    "name": "Provider",
-    "slug": "Slug",
-    "baseUrl": "API Base URL",
+    "name": "Identifier",
+    "displayName": "Display Name",
+    "sort": "Sort",
+    "isDefault": "Default",
     "status": "Status",
-    "healthStatus": {
-      "title": "Health Status",
-      "healthy": "Healthy",
-      "unhealthy": "Unhealthy",
-      "unknown": "Unknown"
-    },
-    "lastCheckAt": "Last Check",
     "operation": "Operation"
   },
   "model": {

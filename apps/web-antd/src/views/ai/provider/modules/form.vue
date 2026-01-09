@@ -8,6 +8,8 @@ import { computed, ref } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
 
+import { message } from 'ant-design-vue';
+
 import { useVbenForm } from '#/adapter/form';
 import { getProvider, updateProvider } from '#/api';
 import { $t } from '#/locales';
@@ -16,7 +18,7 @@ import { useFormSchema } from '../data';
 
 const emits = defineEmits(['success']);
 
-const providerId = ref<string>();
+const providerId = ref<number>();
 const loading = ref(false);
 
 const [Form, formApi] = useVbenForm({
@@ -34,6 +36,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
 
     try {
       await updateProvider(providerId.value!, values);
+      message.success($t('ui.actionMessage.operationSuccess'));
       emits('success');
       drawerApi.close();
     } finally {
@@ -51,14 +54,17 @@ const [Drawer, drawerApi] = useVbenDrawer({
         try {
           const detail = await getProvider(data.id);
           formApi.setValues({
-            baseUrl: detail.baseUrl,
+            displayName: detail.displayName,
+            isDefault: detail.isDefault,
             name: detail.name,
-            slug: detail.slug,
+            sort: detail.sort,
             status: detail.status,
           });
         } finally {
           loading.value = false;
         }
+      } else {
+        loading.value = false;
       }
     }
   },
