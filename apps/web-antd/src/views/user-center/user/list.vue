@@ -96,12 +96,12 @@ function confirm(content: string, title: string) {
 }
 
 async function onStatusChange(
-  newStatus: number,
+  newStatus: string,
   row: UserApi.User,
 ) {
-  const status: Recordable<number> = {
-    1: $t('common.enabled'),
-    2: $t('common.disabled'),
+  const status: Recordable<string> = {
+    disabled: $t('common.disabled'),
+    enabled: $t('common.enabled'),
   };
   try {
     await confirm(

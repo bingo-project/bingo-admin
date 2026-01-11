@@ -98,12 +98,12 @@ export function useFormSchema(isEdit: boolean): VbenFormSchema[] {
       componentProps: {
         buttonStyle: 'solid',
         options: [
-          { label: $t('common.enabled'), value: 1 },
-          { label: $t('common.disabled'), value: 2 },
+          { label: $t('common.enabled'), value: 'enabled' },
+          { label: $t('common.disabled'), value: 'disabled' },
         ],
         optionType: 'button',
       },
-      defaultValue: 1,
+      defaultValue: 'enabled',
       fieldName: 'status',
       label: $t('user.list.status'),
     },
@@ -150,8 +150,8 @@ export function useGridFormSchema(): VbenFormSchema[] {
       componentProps: {
         allowClear: true,
         options: [
-          { label: $t('common.enabled'), value: 1 },
-          { label: $t('common.disabled'), value: 2 },
+          { label: $t('common.enabled'), value: 'enabled' },
+          { label: $t('common.disabled'), value: 'disabled' },
         ],
       },
       fieldName: 'status',
@@ -253,14 +253,14 @@ export function useColumns<T = UserApi.User>(
         attrs: { beforeChange: onStatusChange },
         name: onStatusChange ? 'CellSwitch' : 'CellTag',
         options: [
-          { color: 'success', label: $t('common.enabled'), value: 1 },
-          { color: 'error', label: $t('common.disabled'), value: 2 },
+          { color: 'success', label: $t('common.enabled'), value: 'enabled' },
+          { color: 'error', label: $t('common.disabled'), value: 'disabled' },
         ],
         props: {
           checkedChildren: $t('common.enabled'),
-          checkedValue: 1,
+          checkedValue: 'enabled',
           unCheckedChildren: $t('common.disabled'),
-          unCheckedValue: 2,
+          unCheckedValue: 'disabled',
         },
       },
       field: 'status',

@@ -21,7 +21,7 @@ export namespace UserApi {
     payPassword: boolean;
     phone?: string;
     pid?: number;
-    status: number; // 1-enabled, 2-disabled
+    status: string; // 'enabled' | 'disabled'
     uid: string;
     updatedAt: string;
     username: string;
@@ -37,7 +37,7 @@ export namespace UserApi {
     password: string;
     phone?: string;
     pid?: string;
-    status?: number;
+    status?: 'enabled' | 'disabled';
     username: string;
   }
 
@@ -48,7 +48,7 @@ export namespace UserApi {
     gender?: 'female' | 'male' | 'secret';
     nickname?: string;
     phone?: string;
-    status?: number;
+    status?: 'enabled' | 'disabled';
   }
 
   export interface ResetPasswordRequest {
