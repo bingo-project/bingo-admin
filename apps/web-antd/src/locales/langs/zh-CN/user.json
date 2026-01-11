@@ -1,0 +1,51 @@
+{
+  "center": {
+    "title": "用户中心"
+  },
+  "title": "用户管理",
+  "list": {
+    "title": "用户管理",
+    "list": "用户列表",
+    "name": "用户",
+    "username": "用户名",
+    "nickname": "昵称",
+    "uid": "UID",
+    "email": "邮箱",
+    "phone": "手机号",
+    "age": "年龄",
+    "gender": "性别",
+    "genderMale": "男",
+    "genderFemale": "女",
+    "genderSecret": "保密",
+    "countryCode": "国家代码",
+    "avatar": "头像",
+    "pid": "PID",
+    "status": "状态",
+    "kycStatus": "KYC状态",
+    "kycNotVerify": "未认证",
+    "kycPending": "审核中",
+    "kycVerified": "已认证",
+    "kycFailed": "认证失败",
+    "payPassword": "支付密码",
+    "googleStatus": "Google认证",
+    "inviteCount": "邀请数",
+    "password": "密码",
+    "newPassword": "新密码",
+    "confirmPassword": "确认密码",
+    "passwordHelp": "默认密码为用户名",
+    "passwordMismatch": "两次输入的密码不一致",
+    "resetPassword": "重置密码",
+    "resetPasswordTitle": "重置密码",
+    "resetPasswordConfirm": "确定要重置 {0} 的密码吗？",
+    "keyword": "关键词",
+    "keywordPlaceholder": "UID/用户名/邮箱/手机号",
+    "createdAt": "创建时间",
+    "operation": "操作"
+  },
+  "kyc": {
+    "title": "认证管理"
+  },
+  "level": {
+    "title": "等级管理"
+  }
+}

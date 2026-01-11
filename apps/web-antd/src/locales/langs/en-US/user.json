@@ -1,0 +1,51 @@
+{
+  "center": {
+    "title": "User Center"
+  },
+  "title": "User Management",
+  "list": {
+    "title": "User Management",
+    "list": "User List",
+    "name": "User",
+    "username": "Username",
+    "nickname": "Nickname",
+    "uid": "UID",
+    "email": "Email",
+    "phone": "Phone",
+    "age": "Age",
+    "gender": "Gender",
+    "genderMale": "Male",
+    "genderFemale": "Female",
+    "genderSecret": "Secret",
+    "countryCode": "Country Code",
+    "avatar": "Avatar",
+    "pid": "PID",
+    "status": "Status",
+    "kycStatus": "KYC Status",
+    "kycNotVerify": "Not Verify",
+    "kycPending": "Pending",
+    "kycVerified": "Verified",
+    "kycFailed": "Failed",
+    "payPassword": "Pay Password",
+    "googleStatus": "Google Auth",
+    "inviteCount": "Invite Count",
+    "password": "Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "passwordHelp": "Default password is username",
+    "passwordMismatch": "Passwords do not match",
+    "resetPassword": "Reset Password",
+    "resetPasswordTitle": "Reset Password",
+    "resetPasswordConfirm": "Are you sure to reset password for {0}?",
+    "keyword": "Keyword",
+    "keywordPlaceholder": "UID/Username/Email/Phone",
+    "createdAt": "Created At",
+    "operation": "Operation"
+  },
+  "kyc": {
+    "title": "Verification Management"
+  },
+  "level": {
+    "title": "Level Management"
+  }
+}
