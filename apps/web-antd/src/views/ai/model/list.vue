@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-// ABOUTME: AI Model list page with edit operations
+// ABOUTME: AI Model list page with CRUD operations
 // ABOUTME: Displays AI models with status toggle and action buttons
 
 import type {
@@ -9,11 +9,12 @@ import type {
 import type { AiModelApi } from '#/api';
 
 import { Page, useVbenDrawer } from '@vben/common-ui';
+import { Plus } from '@vben/icons';
 
-import { Modal } from 'ant-design-vue';
+import { Button, message, Modal } from 'ant-design-vue';
 
 import { toApiPagination, useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getModelList, updateModel } from '#/api';
+import { deleteModel, getModelList, updateModel } from '#/api';
 import { $t } from '#/locales';
 
 import { useColumns, useGridFormSchema } from './data';
@@ -58,6 +59,10 @@ const [Grid, gridApi] = useVbenVxeGrid({
 
 function onActionClick(e: OnActionClickParams<AiModelApi.AiModel>) {
   switch (e.code) {
+    case 'delete': {
+      onDelete(e.row);
+      break;
+    }
     case 'edit': {
       onEdit(e.row);
       break;
@@ -82,8 +87,8 @@ function confirm(content: string, title: string) {
 
 async function onStatusChange(newStatus: string, row: AiModelApi.AiModel) {
   const status: Record<string, string> = {
+    active: $t('common.enabled'),
     disabled: $t('common.disabled'),
-    enabled: $t('common.enabled'),
   };
   try {
     await confirm(
@@ -91,7 +96,7 @@ async function onStatusChange(newStatus: string, row: AiModelApi.AiModel) {
       $t('ui.actionTitle.statusChange'),
     );
     await updateModel(row.id, {
-      status: newStatus as 'disabled' | 'enabled',
+      status: newStatus as 'active' | 'disabled',
     });
     return true;
   } catch {
@@ -103,6 +108,29 @@ function onEdit(row: AiModelApi.AiModel) {
   formDrawerApi.setData(row).open();
 }
 
+function onCreate() {
+  formDrawerApi.setData({}).open();
+}
+
+function onDelete(row: AiModelApi.AiModel) {
+  const hideLoading = message.loading({
+    content: $t('ui.actionMessage.deleting', [row.name]),
+    duration: 0,
+    key: 'action_process_msg',
+  });
+  deleteModel(row.id)
+    .then(() => {
+      message.success({
+        content: $t('ui.actionMessage.deleteSuccess', [row.name]),
+        key: 'action_process_msg',
+      });
+      onRefresh();
+    })
+    .catch(() => {
+      hideLoading();
+    });
+}
+
 function onRefresh() {
   gridApi.query();
 }
@@ -110,6 +138,17 @@ function onRefresh() {
 <template>
   <Page auto-content-height>
     <FormDrawer @success="onRefresh" />
-    <Grid :table-title="$t('ai.model.list')" />
+    <Grid :table-title="$t('ai.model.list')">
+      <template #toolbar-tools>
+        <Button
+          v-access:code="'AI:Model:Create'"
+          type="primary"
+          @click="onCreate"
+        >
+          <Plus class="size-5" />
+          {{ $t('ui.actionTitle.create', [$t('ai.model.name')]) }}
+        </Button>
+      </template>
+    </Grid>
   </Page>
 </template>

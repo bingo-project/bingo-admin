@@ -1,26 +1,28 @@
 <script lang="ts" setup>
-// ABOUTME: AI Model edit form component
-// ABOUTME: Handles update operations for AI models
+// ABOUTME: AI Model form component for create and edit
+// ABOUTME: Handles create and update operations for AI models
 
-import type { AiModelApi } from '#/api/ai/model';
+import type { AiModelApi } from '#/api';
 
 import { computed, ref } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
+import { message } from 'ant-design-vue';
 
 import { useVbenForm } from '#/adapter/form';
-import { getModel, updateModel } from '#/api';
+import { createModel, getModel, updateModel } from '#/api';
 import { $t } from '#/locales';
 
 import { useFormSchema } from '../data';
 
 const emits = defineEmits(['success']);
 
-const modelId = ref<string>();
+const isEdit = ref(false);
 const loading = ref(false);
+const resourceId = ref<number>();
 
 const [Form, formApi] = useVbenForm({
-  schema: useFormSchema(),
+  schema: computed(() => useFormSchema(isEdit.value)),
   showDefaultActions: false,
 });
 
@@ -33,7 +35,12 @@ const [Drawer, drawerApi] = useVbenDrawer({
     drawerApi.lock();
 
     try {
-      await updateModel(modelId.value!, values);
+      if (isEdit.value) {
+        await updateModel(resourceId.value!, values);
+      } else {
+        await createModel(values);
+      }
+      message.success($t('ui.actionMessage.operationSuccess'));
       emits('success');
       drawerApi.close();
     } finally {
@@ -47,30 +54,37 @@ const [Drawer, drawerApi] = useVbenDrawer({
       loading.value = true;
 
       if (data?.id) {
-        modelId.value = data.id;
+        isEdit.value = true;
+        resourceId.value = data.id;
         try {
           const detail = await getModel(data.id);
           formApi.setValues({
-            contextLength: detail.contextLength,
+            allowFallback: detail.allowFallback,
             displayName: detail.displayName,
             inputPrice: detail.inputPrice,
+            isDefault: detail.isDefault,
             maxTokens: detail.maxTokens,
-            name: detail.name,
+            model: detail.model,
             outputPrice: detail.outputPrice,
             providerName: detail.providerName,
-            slug: detail.slug,
+            sort: detail.sort,
             status: detail.status,
           });
         } finally {
           loading.value = false;
         }
+      } else {
+        isEdit.value = false;
+        loading.value = false;
       }
     }
   },
 });
 
 const getDrawerTitle = computed(() => {
-  return $t('common.edit', $t('ai.model.name'));
+  return isEdit.value
+    ? $t('ui.actionTitle.edit', [$t('ai.model.name')])
+    : $t('ui.actionTitle.create', [$t('ai.model.name')]);
 });
 </script>
 <template>

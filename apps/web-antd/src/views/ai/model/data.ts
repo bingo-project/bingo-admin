@@ -7,41 +7,40 @@ import type { AiModelApi } from '#/api';
 
 import { $t } from '#/locales';
 
-export function useFormSchema(): VbenFormSchema[] {
+export function useFormSchema(isEdit = false): VbenFormSchema[] {
   return [
     {
-      component: 'Input',
+      component: 'ApiSelect',
       componentProps: {
-        disabled: true,
-      },
-      fieldName: 'name',
-      label: $t('ai.model.name'),
-    },
-    {
-      component: 'Input',
-      componentProps: {
-        disabled: true,
-      },
-      fieldName: 'slug',
-      label: $t('ai.model.slug'),
-    },
-    {
-      component: 'Input',
-      componentProps: {
-        disabled: true,
+        api: async () => {
+          const { getProviderList } = await import('#/api');
+          const providers = await getProviderList();
+          return (providers || []).map((provider) => ({
+            label: provider.name,
+            value: provider.name,
+          }));
+        },
+        disabled: isEdit,
+        placeholder: $t('ai.model.providerName'),
       },
       fieldName: 'providerName',
       label: $t('ai.model.providerName'),
+      rules: isEdit ? undefined : 'required',
+    },
+    {
+      component: 'Input',
+      componentProps: {
+        disabled: isEdit,
+      },
+      fieldName: 'model',
+      label: $t('ai.model.name'),
+      rules: isEdit ? undefined : 'required',
     },
     {
       component: 'Input',
       fieldName: 'displayName',
       label: $t('ai.model.displayName'),
-    },
-    {
-      component: 'InputNumber',
-      fieldName: 'contextLength',
-      label: $t('ai.model.contextLength'),
+      rules: isEdit ? undefined : 'required',
     },
     {
       component: 'InputNumber',
@@ -65,15 +64,35 @@ export function useFormSchema(): VbenFormSchema[] {
       label: $t('ai.model.outputPrice'),
     },
     {
+      component: 'Checkbox',
+      componentProps: {},
+      defaultValue: false,
+      fieldName: 'isDefault',
+      label: $t('ai.model.isDefault'),
+    },
+    {
+      component: 'InputNumber',
+      fieldName: 'sort',
+      label: $t('ai.model.sort'),
+    },
+    {
+      component: 'Checkbox',
+      componentProps: {},
+      defaultValue: true,
+      fieldName: 'allowFallback',
+      label: $t('ai.model.allowFallback'),
+    },
+    {
       component: 'RadioGroup',
       componentProps: {
         buttonStyle: 'solid',
         options: [
-          { label: $t('common.enabled'), value: 'enabled' },
+          { label: $t('common.enabled'), value: 'active' },
           { label: $t('common.disabled'), value: 'disabled' },
         ],
         optionType: 'button',
       },
+      defaultValue: 'active',
       fieldName: 'status',
       label: $t('ai.model.status'),
     },
@@ -84,13 +103,8 @@ export function useGridFormSchema(): VbenFormSchema[] {
   return [
     {
       component: 'Input',
-      fieldName: 'name',
+      fieldName: 'model',
       label: $t('ai.model.name'),
-    },
-    {
-      component: 'Input',
-      fieldName: 'slug',
-      label: $t('ai.model.slug'),
     },
     {
       component: 'Input',
@@ -102,7 +116,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
       componentProps: {
         allowClear: true,
         options: [
-          { label: $t('common.enabled'), value: 'enabled' },
+          { label: $t('common.enabled'), value: 'active' },
           { label: $t('common.disabled'), value: 'disabled' },
         ],
       },
@@ -118,42 +132,18 @@ export function useColumns<T = AiModelApi.AiModel>(
 ): VxeTableGridOptions['columns'] {
   return [
     {
-      field: 'name',
+      field: 'model',
       title: $t('ai.model.name'),
-      width: 150,
-    },
-    {
-      field: 'slug',
-      title: $t('ai.model.slug'),
-      width: 150,
+      width: 180,
     },
     {
       field: 'displayName',
+      minWidth: 200,
       title: $t('ai.model.displayName'),
-      width: 150,
     },
     {
       field: 'providerName',
       title: $t('ai.model.providerName'),
-      width: 120,
-    },
-    {
-      cellRender: {
-        name: 'CellTag',
-        options: [
-          { color: 'cyan', label: 'Tech', value: 'tech' },
-          { color: 'blue', label: 'General', value: 'general' },
-          { color: 'purple', label: 'Creative', value: 'creative' },
-          { color: 'orange', label: 'Career', value: 'career' },
-        ],
-      },
-      field: 'category',
-      title: $t('ai.model.category'),
-      width: 100,
-    },
-    {
-      field: 'contextLength',
-      title: $t('ai.model.contextLength'),
       width: 120,
     },
     {
@@ -162,16 +152,46 @@ export function useColumns<T = AiModelApi.AiModel>(
       width: 120,
     },
     {
+      field: 'inputPrice',
+      title: $t('ai.model.inputPrice'),
+      width: 120,
+    },
+    {
+      field: 'outputPrice',
+      title: $t('ai.model.outputPrice'),
+      width: 120,
+    },
+    {
+      cellRender: {
+        name: 'CellTag',
+        options: [
+          {
+            color: 'processing',
+            label: $t('common.yes'),
+            value: true,
+          },
+          {
+            color: 'default',
+            label: $t('common.no'),
+            value: false,
+          },
+        ],
+      },
+      field: 'isDefault',
+      title: $t('ai.model.isDefault'),
+      width: 100,
+    },
+    {
       cellRender: {
         attrs: { beforeChange: onStatusChange },
         name: onStatusChange ? 'CellSwitch' : 'CellTag',
         options: [
-          { color: 'success', label: $t('common.enabled'), value: 'enabled' },
+          { color: 'success', label: $t('common.enabled'), value: 'active' },
           { color: 'error', label: $t('common.disabled'), value: 'disabled' },
         ],
         props: {
           checkedChildren: $t('common.enabled'),
-          checkedValue: 'enabled',
+          checkedValue: 'active',
           unCheckedChildren: $t('common.disabled'),
           unCheckedValue: 'disabled',
         },
@@ -184,17 +204,20 @@ export function useColumns<T = AiModelApi.AiModel>(
       align: 'center',
       cellRender: {
         attrs: {
-          nameField: 'name',
+          nameField: 'model',
           nameTitle: $t('ai.model.name'),
           onClick: onActionClick,
         },
         name: 'CellOperation',
-        options: [{ auth: 'AI:Model:Edit', code: 'edit' }],
+        options: [
+          { auth: 'AI:Model:Edit', code: 'edit' },
+          { auth: 'AI:Model:Delete', code: 'delete' },
+        ],
       },
       field: 'operation',
       fixed: 'right',
       title: $t('ai.model.operation'),
-      width: 120,
+      width: 130,
     },
   ];
 }

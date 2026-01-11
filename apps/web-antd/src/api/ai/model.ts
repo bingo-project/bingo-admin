@@ -8,28 +8,43 @@ import { requestClient } from '#/api/request';
 export namespace AiModelApi {
   export interface AiModel {
     [key: string]: any;
-    id: string;
-    providerId: string;
+    id: number;
     providerName: string;
-    name: string;
-    slug: string;
+    model: string;
     displayName?: string;
-    contextLength?: number;
     maxTokens?: number;
     inputPrice?: number;
     outputPrice?: number;
-    status: 'disabled' | 'enabled';
+    status: 'active' | 'disabled';
+    isDefault?: boolean;
+    sort?: number;
+    allowFallback?: boolean;
     createdAt: string;
     updatedAt: string;
   }
 
-  export interface UpdateModelRequest {
+  export interface CreateModelRequest {
+    providerName: string;
+    model: string;
     displayName?: string;
-    contextLength?: number;
     maxTokens?: number;
     inputPrice?: number;
     outputPrice?: number;
-    status?: 'disabled' | 'enabled';
+    status?: 'active' | 'disabled';
+    isDefault?: boolean;
+    sort?: number;
+    allowFallback?: boolean;
+  }
+
+  export interface UpdateModelRequest {
+    displayName?: string;
+    maxTokens?: number;
+    inputPrice?: number;
+    outputPrice?: number;
+    status?: 'active' | 'disabled';
+    isDefault?: boolean;
+    sort?: number;
+    allowFallback?: boolean;
   }
 }
 
@@ -44,8 +59,16 @@ async function getModelList(params?: Recordable<any>) {
  * 获取 AI Model 详情
  * @param id Model ID
  */
-async function getModel(id: string) {
+async function getModel(id: number) {
   return requestClient.get<AiModelApi.AiModel>(`/v1/ai/models/${id}`);
+}
+
+/**
+ * 创建 AI Model
+ * @param data 创建数据
+ */
+async function createModel(data: AiModelApi.CreateModelRequest) {
+  return requestClient.post<AiModelApi.AiModel>('/v1/ai/models', data);
 }
 
 /**
@@ -53,8 +76,16 @@ async function getModel(id: string) {
  * @param id Model ID
  * @param data 更新数据
  */
-async function updateModel(id: string, data: AiModelApi.UpdateModelRequest) {
+async function updateModel(id: number, data: AiModelApi.UpdateModelRequest) {
   return requestClient.put<AiModelApi.AiModel>(`/v1/ai/models/${id}`, data);
 }
 
-export { getModel, getModelList, updateModel };
+/**
+ * 删除 AI Model
+ * @param id Model ID
+ */
+async function deleteModel(id: number) {
+  return requestClient.delete(`/v1/ai/models/${id}`);
+}
+
+export { createModel, deleteModel, getModel, getModelList, updateModel };
