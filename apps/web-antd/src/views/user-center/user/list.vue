@@ -108,7 +108,10 @@ async function onStatusChange(
       `${$t('ui.actionMessage.confirmStatusChange', [row.nickname, status[newStatus]])}`,
       $t('ui.actionTitle.statusChange'),
     );
-    await updateUser(row.uid, { status: newStatus });
+    await updateUser(row.uid, {
+      status: newStatus as 'disabled' | 'enabled',
+    });
+    message.success($t('ui.actionMessage.operationSuccess'));
     return true;
   } catch {
     return false;
