@@ -106,6 +106,7 @@ async function onStatusChange(
       $t('ui.actionTitle.statusChange'),
     );
     await updateRole(row.name, { status: newStatus });
+    message.success($t('ui.actionMessage.operationSuccess'));
     return true;
   } catch {
     return false;

@@ -97,6 +97,7 @@ async function onStatusChange(
     await updateProvider(row.id, {
       status: newStatus as 'active' | 'disabled',
     });
+    message.success($t('ui.actionMessage.operationSuccess'));
     return true;
   } catch {
     return false;

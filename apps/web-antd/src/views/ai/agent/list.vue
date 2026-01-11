@@ -98,6 +98,7 @@ async function onStatusChange(newStatus: string, row: AiAgentApi.AiAgent) {
     await updateAgent(row.id, {
       status: newStatus as 'disabled' | 'enabled',
     });
+    message.success($t('ui.actionMessage.operationSuccess'));
     return true;
   } catch {
     return false;

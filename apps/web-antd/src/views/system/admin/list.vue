@@ -113,6 +113,7 @@ async function onStatusChange(
     await updateAdmin(row.username, {
       status: newStatus as 'disabled' | 'enabled',
     });
+    message.success($t('ui.actionMessage.operationSuccess'));
     return true;
   } catch {
     return false;

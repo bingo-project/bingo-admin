@@ -98,6 +98,7 @@ async function onStatusChange(newStatus: string, row: AiModelApi.AiModel) {
     await updateModel(row.id, {
       status: newStatus as 'active' | 'disabled',
     });
+    message.success($t('ui.actionMessage.operationSuccess'));
     return true;
   } catch {
     return false;
